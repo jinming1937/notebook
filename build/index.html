@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notebook</title>
+</head>
+<body>
+  <div id="page">
+    <div class="box">
+      <div class="content" id="content">
+        <ul class="treeContent" id="treeContent"></ul>
+        <div class="activeBarMask" id="activeBarMask">
+          <div class="targetBar" id="targetBar"></div>
+        </div>
+        <div class="fileContent">
+          <div class="fileTitle">
+            <input type="button" value="添加目录" id="addContent">
+            <input type="button" value="添加文件" id="addFile">
+          </div>
+          <ul class="fileList" id="fileList"></ul>
+        </div>
+      </div>
+      <div class="editor">
+        <div class="toolBar">
+          <input type="button" id="down" value="导出" />
+          |
+          <input tabindex="0" type="text" value="" id="title" placeholder="请输入12字以内的标题" maxlength="12" />
+          |
+          <label for="theme">dark</label>
+          <input type="checkbox" name="theme" id="theme">
+          |
+          <label for="spellcheck">spellcheck</label>
+          <input type="checkbox" name="spellcheck" id="spellcheck">
+          |
+          <label for="fontSize">fontSize</label>
+          <select id="fontSize" value="14px" class="fontList">
+            <option value="12px">12px</option>
+            <option value="14px">14px</option>
+            <option value="16px">16px</option>
+          </select>
+          |
+          <label>
+            <a class="linkBtn">h1</a>
+            <a class="linkBtn">h2</a>
+            <a class="linkBtn">h3</a>
+            <a class="linkBtn">h4</a>
+            <a class="linkBtn">h5</a>
+            <a class="linkBtn">h6</a>
+            <a class="linkBtn">-</a>
+            <a class="linkBtn">link</a>
+          </label>
+        </div>
+        <div class="editorContent">
+          <div class="editorInput">
+            <textarea tabindex="1" class="inputBox" id="inputBox" cols="30" rows="10"></textarea>
+          </div>
+          <div class="preview">
+            <iframe id="frameDom">浏览器不支持IFrame，无法正确显示内容</iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

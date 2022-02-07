@@ -1,0 +1,38 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: grid;
+}
+
+.frameBox {
+  font-size: 14px;
+  color: #222;
+}
+
+.frameBox.dark {
+  color: #eee
+}
+
+.frameBox.light {
+  color: #222;
+}
+
+.frameBox span {
+  color: #ff5;
+  background: red;
+}
+
+.frameBox a {
+  color: #007cff;
+}
+
+.frameBox a:active {
+  color: #007cff;
+}
