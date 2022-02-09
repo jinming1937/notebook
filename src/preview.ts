@@ -1,6 +1,5 @@
-import {md2HTML} from './js/md2html';
-import {$dom, $parentDom} from './js/key';
-// import './css/preview.css';
+import {md2HTML} from './view/md2html';
+import { $dom, $parentDom } from './util';
 
 window.onload = (e) => {
   console.log('frame ready');

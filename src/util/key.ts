@@ -2,6 +2,10 @@ export function randomNum() {
   return new Date().getTime() + parseInt((Math.random() * 1000).toFixed(0));
 }
 
+export function randomNumber() {
+  return new Date().getTime();
+}
+
 export const $dom = <T extends HTMLElement>(str: string) => {
   const dom = document.getElementById(str);
   if (dom) {

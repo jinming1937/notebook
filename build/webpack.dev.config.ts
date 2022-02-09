@@ -1,6 +1,9 @@
 import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import webpack from 'webpack';
+
+function resolve(dir: string): string {
+  return path.join(__dirname, '..', dir)
+}
 
 const config = {
   entry: {
@@ -12,8 +15,10 @@ const config = {
     filename: '[name].bundle.js',
   },
   resolve: {
-    // Add `.ts` and `.tsx` as a resolvable extension.
-    extensions: [".ts", ".js", '.css']
+    alias: {
+      '@': resolve('src')
+    },
+    extensions: [".ts", ".js", '.css', '.less']
   },
   module: {
     rules: [
@@ -33,6 +38,17 @@ const config = {
       template: './build/preview.html',
     })
   ],
+  devServer: {
+    proxy:  {
+      '/api': {
+        target: `http://127.0.0.1:9960`,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': '/api'
+        }
+      }
+    },
+  },
   mode: 'development',
 };
 

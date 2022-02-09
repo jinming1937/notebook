@@ -1,22 +1,27 @@
 import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import webpack from 'webpack';
 
 // webpack 天生只理解JavaScript和JSON
 
+function resolve(dir: string): string {
+  return path.join(__dirname, '..', dir)
+}
+
 const config = {
   entry: {
-    main: './src/index.ts',
-    // preview: './src/preview.js',
+    main: ['./src/css/base.css', './src/index.ts'],
+    preview: ['./src/css/preview.css', './src/preview.ts'],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].bundle.js',
   },
   resolve: {
-    // Add `.ts` and `.css` as a resolvable extension.
-    extensions: [".ts", ".js", '.css']
+    alias: {
+      '@': resolve('src')
+    },
+    extensions: [".ts", ".js", '.css', '.less']
   },
   module: {
     rules: [
@@ -25,7 +30,17 @@ const config = {
       { test: /\.less$/, use: 'less-loader' }
     ],
   },
-  plugins: [new HtmlWebpackPlugin({ template: './build/index.html' })],
+  plugins: [
+    new HtmlWebpackPlugin({
+      chunks: ['main'],
+      template: './build/index.html'
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'preview.html',
+      chunks: ['preview'],
+      template: './build/preview.html',
+    })
+  ],
   mode: 'production',
 };
 

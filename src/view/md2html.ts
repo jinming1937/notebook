@@ -1,7 +1,7 @@
 /**
  * MD to HTML
  */
-import {randomNum} from './key';
+import { randomNum } from "@/util"
 
 // 匹配开头符号
 const regMark = /^(.+?)\s/
