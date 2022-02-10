@@ -1,7 +1,7 @@
 import { FileType, IContent } from "../entity/common";
 import { getAllContent, addContent, removeContent, changeContentTitle } from "../net/content";
 import { saveFile } from "../net/file";
-import { $dom, debounce, getItemById, IDS, randomNumber } from "../util";
+import { $dom, debounce, getItemById, IDS, randomNumber, sendToFrame } from "../util";
 import { readFile } from "./doc";
 import { clearFile, renderFileList } from "./fileList";
 let ROOT_ID = -1;
@@ -29,6 +29,7 @@ export function initContent () {
   const list: IContent[] = [];
   let current: IContent | null = null;
   let currentFile: IContent | null = null;
+  const sender = sendToFrame()
   // 获取数据
   getAllContent().then((data: IContent) => {
     if (data) {
@@ -51,6 +52,7 @@ export function initContent () {
       target.className = '';
     });
     clearFile();
+    sender('');
     if (current) {
       current.active = false;
       current = null;
@@ -83,12 +85,10 @@ export function initContent () {
         current = getItemById(ROOT_ID, list);
         if (current) {
           current.active = true;
-          // currentFile.id = current.id + '_' + currentFile.id
           currentFile.parent = current.id;
           current.children?.push(currentFile);
         }
       } else {
-        // currentFile.id = current.id + '_' + currentFile.id
         currentFile.parent = current.id;
         if (current.children) {
           current.children.push(currentFile);
@@ -105,16 +105,21 @@ export function initContent () {
         } else {
           console.log('error', data);
         }
-        // renderContent(list);
-        // renderFileList(current?.children || []);
       });
     } else {
       $dom<HTMLInputElement>(IDS.Title)!.value = currentFile.name;
       const id = currentFile.id;
       clearTimeout(inputTimeFlag);
       inputTimeFlag = setTimeout(() => {
-        saveFile(id, (e.target as HTMLInputElement).value);
-        console.log('save success!');
+        sender((e.target as HTMLInputElement).value);
+        saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
+          console.log(data);
+          if (data) {
+            console.log('save success!');
+          } else {
+            console.log('save fail!');
+          }
+        });
       }, 500);
     }
   });
@@ -180,8 +185,6 @@ export function initContent () {
       const index = (element as HTMLElement).getAttribute('index') || '0';
       const id = (element!.parentNode as HTMLDivElement)!.getAttribute('key') || '';
       const currentNode = getItemById(parseInt(id), list);
-      // const parentIdList = id.split('_');
-      // parentIdList.pop();
       const parentNode = getItemById(currentNode?.parent || ROOT_ID, list);
       const confirm = window.confirm(`Do you want to delete the file:[${currentNode?.name}] ?`);
       if (!confirm) {
@@ -216,7 +219,7 @@ export function initContent () {
         currentFile = item;
         currentFile.active = true;
         renderFileList(current?.children || []);
-        readFile(currentFile.id, list);
+        readFile(currentFile);
       }
       element.className = 'active';
     }
@@ -229,7 +232,6 @@ export function initContent () {
       type: 'file',
     };
     if (current) {
-      // newFile.id = current.id + '_' + newFile.id;
       (newFile as IContent).parent = current.id;
       if (current.children) {
         current.children.push(newFile as IContent);
@@ -242,7 +244,6 @@ export function initContent () {
         currentFile = newFile as IContent;
         currentFile.active = true;
       }
-      // renderFileList(current.children);
       addContent(newFile.name, newFile.type as FileType, current.id).then((data) => {
         console.log(data);
         if (data.id) {
@@ -269,7 +270,6 @@ export function initContent () {
       } else {
         current.children = [newContent as IContent];
       }
-      // renderFileList(current.children);
     } else {
       current = getItemById(ROOT_ID, list);
       if (current) {

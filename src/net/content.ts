@@ -50,3 +50,12 @@ export function getAllContent() {
     return data.data;
   })
 }
+
+export function getFileList() {
+  return fetch('/api/nb/get_content_list', {
+    method: 'GET'
+  }).then(res => res.json()).then((data) => {
+    console.log('目录数据', data.data);
+    return data.data;
+  })
+}

@@ -21,3 +21,11 @@ export function debounce(callback: () => void, timeFlag: number) {
     callback && callback()
   }, timeFlag);
 }
+
+export function sendToFrame() {
+  //主页面发送消息
+  const myFrame = document.getElementById("frameDom");//获取框架
+  return (value: string) => {
+    (myFrame as HTMLIFrameElement)?.contentWindow?.postMessage(value, "http://localhost:8080");
+  }
+}

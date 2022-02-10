@@ -8,7 +8,6 @@ html, body {
   position: absolute;
   width: 100%;
   height: 100%;
-  display: grid;
 }
 
 .frameBox {
@@ -35,4 +34,17 @@ html, body {
 
 .frameBox a:active {
   color: #007cff;
+}
+
+.selectHeader {
+  text-align: center;
+  height: 36px;
+}
+
+.hide {
+  display: none;
+}
+
+.frameBox.viewPage {
+  padding: 12px 24px;
 }
