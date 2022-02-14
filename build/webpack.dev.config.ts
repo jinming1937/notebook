@@ -7,8 +7,8 @@ function resolve(dir: string): string {
 
 const config = {
   entry: {
-    main: ['./src/css/base.css', './src/index.ts'],
-    preview: ['./src/css/preview.css', './src/preview.ts'],
+    main: ['./src/css/base.less', './src/index.ts'],
+    preview: ['./src/css/preview.less', './src/preview.ts'],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -24,7 +24,7 @@ const config = {
     rules: [
       { test: /\.ts$/, use: 'ts-loader' },
       { test: /\.css$/, use: ['style-loader', 'css-loader'] },
-      { test: /\.less$/, use: 'less-loader' }
+      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] }
     ],
   },
   plugins: [

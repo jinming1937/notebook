@@ -4,8 +4,9 @@ export type IContent = {
   name: string;
   id: number;
   type: FileType;
-  readonly?: boolean;
+  parent: number;
   active?: boolean;
   children?: IContent[];
-  parent: number;
+  readonly?: boolean;
+  switch?: boolean;
 }

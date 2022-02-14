@@ -38,7 +38,7 @@ function format(content: string) {
       const suffix = content.slice(index + result[0].length);
 
       if (TagMap[tag]) {
-        strHtml = `${prefix}<${TagMap[tag]}>${content}</${TagMap[tag]}>${suffix}`;
+        strHtml = `${prefix}<${TagMap[tag]}>${textOrLink}</${TagMap[tag]}>${suffix}`;
       } else {
         strHtml = `${prefix}<a href="${textOrLink}" target="_blank">${tag}</a>${suffix}`;
       }
@@ -77,7 +77,9 @@ function formatLine(lineStr: string) {
         htmlList.push(`<${tag}>${inner}</${tag}>`, tag);
       }
     });
-    return htmlList;
+    if (htmlList.length > 0) {
+      return htmlList;
+    }
   }
 
   const inline = matchInline(lineStr);
@@ -85,9 +87,10 @@ function formatLine(lineStr: string) {
     return [inline, 'p'];
   }
 
-  if (lineStr.match(/^```/)) {
-    return [`<code>`, 'code'];
-  }
+  // if (lineStr.match(/^```/)) {
+  //   console.log('1122');
+  //   return [`<code>`, 'code'];
+  // }
 
   return [`<div>${lineStr}</div>`, 'div'];
 }

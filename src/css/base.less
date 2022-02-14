@@ -64,28 +64,27 @@ input[type="button"] {
 
 /* ----------------tool bar end------------------ */
 
-/* ----------------page box start------------------ */
 .box {
   display: flex;
   height: 100%;
-}
 
-.box .content {
-  width: 400px;
-  min-width: 280px;
-  max-width: 520px;
-  padding: 12px 0 12px 12px;
-  user-select: none;
-  display: flex;
-  position: relative;
-}
+  /* ----------------page box start------------------ */
+  .content {
+    width: 400px;
+    min-width: 280px;
+    max-width: 520px;
+    padding: 12px 0 12px 12px;
+    user-select: none;
+    display: flex;
+    // position: relative;
+  }
 
-.box .editor {
-  flex: 1;
-  padding: 12px 5px;
+  .editor {
+    flex: 1;
+    padding: 12px 5px;
+  }
+  /* ----------------page box end------------------ */
 }
-
-/* ----------------page box end------------------ */
 
 /* ---------------- Content start --------------- */
 .content .treeContent {
@@ -104,11 +103,11 @@ input[type="button"] {
   width: 100%;
   min-height: 30px;
   padding: 5px;
-  overflow: hidden;
   word-break: keep-all;
+  position: relative;
 }
 
-.box .content .treeContent [key]:hover {
+.box .content .treeContent [key] span:last-child:hover {
   text-decoration: underline;
 }
 
@@ -116,38 +115,69 @@ input[type="button"] {
   width: 100%;
   text-overflow: ellipsis;
   padding-right: 30px;
-  position: relative;
   white-space: nowrap;
   overflow: hidden;
   word-break: keep-all;
+  position: relative;
 }
 
 .box .content .fileContent .fileList li:hover {
   text-decoration: underline;
 }
 
+.treeContent {
+  li {
+    .file_icon {
+      height: 20px;
+      width: 20px;
+      display: inline-block;
+      vertical-align: bottom;
+      margin-right: 5px;
+    }
+  }
+
+  .triangle {
+    display: inline-block;
+    border-left: 8px solid rgb(0 207 205);
+    border-bottom: 6px solid transparent;
+    border-top: 6px solid transparent;
+    position: absolute;
+    margin: 3px;
+    left: -13px;
+    top: 7px;
+    transition: transform 0.3s;
+    transform: rotate(0deg);
+
+    &.close {
+      transform: rotate(90deg);
+    }
+  }
+}
+
 .box .content .treeContent [key].active {
   background-image: linear-gradient(to top, #c1c1c1, transparent);
 }
 
-.box .content .treeContent .subMenu { 
+.box .content .treeContent .subMenu {
   margin-left: 15px;
-  position: relative;
+  // position: relative;
 }
 
-.box .content .treeContent .subMenu::before {
-  content: ' ';
-  display: inline-block;
-  border-left: 6px solid rgb(0 207 205);
-  border-bottom: 6px solid transparent;
-  border-top: 6px solid transparent;
-  position: absolute;
-  /* left: -10px;
-  top: 9px; */
-  left: -24px;
-  top: -20px;
-  transform: rotate(90deg);
-}
+
+
+// .box .content .treeContent .subMenu::before {
+//   content: ' ';
+//   display: inline-block;
+//   border-left: 6px solid rgb(0 207 205);
+//   border-bottom: 6px solid transparent;
+//   border-top: 6px solid transparent;
+//   position: absolute;
+//   /* left: -10px;
+//   top: 9px; */
+//   left: -24px;
+//   top: -20px;
+//   transform: rotate(90deg);
+// }
 
 .box .content .activeBarMask {
   width: 3px;
@@ -299,4 +329,39 @@ input[type="button"] {
 
 .light .toolBar {
   color: #222;
+}
+
+
+.dark {
+  .treeContent {
+    li .file_icon {
+      &.open {
+        background: url(../img/open1.png) no-repeat center center;
+        background-size: 16px 16px;
+      }
+      &.close {
+        background: url(../img/close1.png) no-repeat center center;
+        background-size: 16px 16px;
+      }
+    }
+  }
+}
+
+.light {
+  .treeContent {
+    li .file_icon {
+      &.open {
+        background: url(../img/open.png) no-repeat center center;
+        background-size: 16px 16px;
+      }
+      &.close {
+        background: url(../img/close.png) no-repeat center center;
+        background-size: 16px 16px;
+      }
+    }
+  }
+}
+
+.hidden {
+  display: none;
 }

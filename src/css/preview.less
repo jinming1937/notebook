@@ -8,6 +8,7 @@ html, body {
   position: absolute;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
 }
 
 .frameBox {
@@ -15,25 +16,17 @@ html, body {
   color: #222;
 }
 
-.frameBox.dark {
-  color: #eee
-}
-
-.frameBox.light {
-  color: #222;
-}
-
 .frameBox span {
-  color: #ff5;
-  background: red;
+  color: #ffffa9;
+  background: #6866e5;
 }
 
 .frameBox a {
-  color: #007cff;
+  color: #1184ff;
 }
 
 .frameBox a:active {
-  color: #007cff;
+  color: #1184ff;
 }
 
 .selectHeader {
@@ -47,4 +40,20 @@ html, body {
 
 .frameBox.viewPage {
   padding: 12px 24px;
+}
+
+.frameBox.dark {
+  color: #eee;
+
+  a {
+    color: #9acbff;
+  }
+}
+
+.frameBox.light {
+  color: #222;
+
+  a {
+    color: #1184ff;
+  }
 }

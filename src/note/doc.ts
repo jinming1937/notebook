@@ -7,8 +7,8 @@ export function readFile(currentFile: IContent) {
   $dom<HTMLInputElement>(IDS.Title)!.value = currentFile.name;
   if (currentFile.type === 'file') {
     getFile(currentFile.id).then((data) => {
-      $dom<HTMLInputElement>(IDS.InputBox)!.value = data.content || '';
-      sender(data.content || '')
+      $dom<HTMLInputElement>(IDS.InputBox)!.value = data ? data.content : '';
+      sender(data ? data.content : '')
     });
   } else {
     sender('')

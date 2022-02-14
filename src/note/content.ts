@@ -6,14 +6,17 @@ import { readFile } from "./doc";
 import { clearFile, renderFileList } from "./fileList";
 let ROOT_ID = -1;
 
+const icon = (state: boolean | undefined) => `<span class="file_icon ${state ? 'open': 'close'}"></span>`;
+const triangle = (state: boolean | undefined) => `<span class="triangle ${!state ? '' : 'close'}"></span>`;
 function createContentTree (list: IContent[]) {
   let html = ''
   list.forEach((content: IContent) => {
+    content.switch = typeof content.switch === 'undefined' ? true: content.switch;
     if (content.children && content.children.length > 0 && content.children.filter(item => item.type === 'content').length > 0) {
-      const cache = `<ul class="subMenu">${createContentTree(content.children)}</ul>`;
-      html+= `<li><div key="${content.id}" class="${content.active ? 'active': ''}">${content.name}</div>${cache}</li>`
+      const cache = `<ul class="subMenu ${content.switch ? '' : 'hidden'}">${createContentTree(content.children)}</ul>`;
+      html+= `<li><div key="${content.id}" class="${content.active ? 'active': ''}">${triangle(content.switch)}${icon(content.switch)}<span>${content.name}</span></div>${cache}</li>`
     } else if (content.type === 'content') {
-      html += `<li class="${content.active ? 'active': ''}" key="${content.id}">${content.name}</li>`
+      html += `<li class="${content.active ? 'active': ''}" key="${content.id}">${icon(false)}<span>${content.name}</span></li>`
     }
   });
 
@@ -40,6 +43,17 @@ export function initContent () {
   });
 
   $dom(IDS.TreeContent)!.addEventListener('click', (e) => {
+    const element = e.target as HTMLElement;
+    if (element.className.match('triangle') !== null) {
+      const id = element.parentElement?.getAttribute('key') || '';
+      const item = getItemById(parseInt(id), list);
+      item!.switch = !item?.switch;
+      const parentDom = document.querySelector(`[key="${id}"]`);
+      parentDom!.querySelector('.triangle')!.className = `triangle ${item?.switch ? 'close': ''}`;
+      parentDom!.querySelector('.file_icon')!.className = `file_icon ${item?.switch ? 'open': 'close'}`;
+      parentDom!.parentElement!.querySelector('.subMenu')!.className = `subMenu ${item?.switch ? '' : 'hidden' }`;
+      return;
+    }
     $dom(IDS.TreeContent)!.querySelectorAll('[key]').forEach((target) => {
       target.className = '';
       const key = target.getAttribute('key') || '';
@@ -61,15 +75,16 @@ export function initContent () {
       currentFile.active = false;
       currentFile = null;
     }
-    if ((e.target as HTMLLIElement | HTMLDivElement)!.getAttribute('key')) {
-      const id = (e.target as HTMLLIElement | HTMLDivElement)!.getAttribute('key') || '';
+    console.log(element);
+    if ((element)!.getAttribute('key')) {
+      const id = (element)!.getAttribute('key') || '';
       const item = getItemById(parseInt(id), list);
       if (item) {
         current = item;
         current.active = true;
         renderFileList(item.children || []);
       }
-      (e.target as HTMLLIElement | HTMLDivElement)!.className = 'active';
+      (element)!.className = 'active';
     }
   });
 
@@ -113,7 +128,7 @@ export function initContent () {
       inputTimeFlag = setTimeout(() => {
         sender((e.target as HTMLInputElement).value);
         saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
-          console.log(data);
+          // console.log(data);
           if (data) {
             console.log('save success!');
           } else {
