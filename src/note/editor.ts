@@ -61,4 +61,11 @@ export function initEditor() {
   });
 
   registerTheme();
+
+  document.addEventListener('visibilitychange', (e) => {
+    console.log(12);
+    if (!(document.hidden)) {
+      timeTheme();
+    }
+  })
 }

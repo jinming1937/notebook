@@ -19,6 +19,7 @@ export function renderFileList(list: IContent[]) {
 }
 
 export function clearFile() {
+  $dom<HTMLDivElement>(IDS.FileList)!.innerHTML = '';
   $dom<HTMLInputElement>(IDS.Title)!.value = '';
   $dom<HTMLInputElement>(IDS.InputBox)!.value = '';
 }

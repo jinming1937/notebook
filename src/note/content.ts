@@ -75,16 +75,16 @@ export function initContent () {
       currentFile.active = false;
       currentFile = null;
     }
-    console.log(element);
-    if ((element)!.getAttribute('key')) {
-      const id = (element)!.getAttribute('key') || '';
+    const keyElement = element.getAttribute('key') ? element : element.parentElement;
+    if (keyElement?.getAttribute('key')) {
+      const id = (keyElement)!.getAttribute('key') || '';
       const item = getItemById(parseInt(id), list);
       if (item) {
         current = item;
         current.active = true;
         renderFileList(item.children || []);
       }
-      (element)!.className = 'active';
+      (keyElement)!.className = 'active';
     }
   });
 
@@ -101,12 +101,12 @@ export function initContent () {
         if (current) {
           current.active = true;
           currentFile.parent = current.id;
-          current.children?.push(currentFile);
+          current.children?.unshift(currentFile);
         }
       } else {
         currentFile.parent = current.id;
         if (current.children) {
-          current.children.push(currentFile);
+          current.children.unshift(currentFile);
         } else {
           current.children = [currentFile];
         }
@@ -152,12 +152,12 @@ export function initContent () {
         if (current) {
           current.active = true;
           currentFile.parent = current.id;
-          current.children?.push(currentFile);
+          current.children?.unshift(currentFile);
         }
       } else {
         currentFile.parent = current.id;
         if (current.children) {
-          current.children.push(currentFile);
+          current.children.unshift(currentFile);
         } else {
           current.children = [currentFile];
         }
@@ -249,7 +249,7 @@ export function initContent () {
     if (current) {
       (newFile as IContent).parent = current.id;
       if (current.children) {
-        current.children.push(newFile as IContent);
+        current.children.unshift(newFile as IContent);
       } else {
         current.children = [(newFile as IContent)];
       }
@@ -281,7 +281,7 @@ export function initContent () {
     if (current) {
       (newContent as IContent).parent = current.id;
       if (current.children) {
-        current.children.push(newContent as IContent);
+        current.children.unshift(newContent as IContent);
       } else {
         current.children = [newContent as IContent];
       }
@@ -290,7 +290,7 @@ export function initContent () {
       if (current) {
         current.active = true;
         (newContent as IContent).parent = current.id;
-        current.children?.push(newContent as IContent);
+        current.children?.unshift(newContent as IContent);
       } else {
         alert('error !!! not found root!!!');
         return;
