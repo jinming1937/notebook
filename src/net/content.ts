@@ -1,13 +1,8 @@
 import {FileType} from "@/entity/common";
+import { get, IRes, post } from "./http";
 
 export function addContent(name: string, type: FileType, parentId: number) {
-  return fetch('/api/nb/add_content', {
-    method: 'POST',
-    body: JSON.stringify({name, type, parent_id: parentId}),
-    headers: {
-      'Content-Type': 'application/json'
-    },
-  }).then(res => res.json()).then((res) => {
+  return post<IRes>('/api/nb/add_content', {name, type, parent_id: parentId}).then((res) => {
     return res.data;
   }).catch((err) => {
     console.log(err);
@@ -15,13 +10,7 @@ export function addContent(name: string, type: FileType, parentId: number) {
 }
 
 export function removeContent(id: string) {
-  return fetch('/api/nb/remove_content', {
-    method: 'POST',
-    body: JSON.stringify({id}),
-    headers: {
-      'Content-Type': 'application/json'
-    },
-  }).then(res => res.json()).then((res) => {
+  return post<IRes>('/api/nb/remove_content', {id}).then((res) => {
     return res.data;
   }).catch((err) => {
     console.log(err);
@@ -29,13 +18,7 @@ export function removeContent(id: string) {
 }
 
 export function changeContentTitle(name: string, id: number) {
-  return fetch('/api/nb/change_content', {
-    method: 'POST',
-    body: JSON.stringify({name, id}),
-    headers: {
-      'Content-Type': 'application/json'
-    },
-  }).then(res => res.json()).then((res) => {
+  return post<{data: any}>('/api/nb/change_content', {name, id}).then((res) => {
     return res.data;
   }).catch((err) => {
     console.log(err);
@@ -43,18 +26,14 @@ export function changeContentTitle(name: string, id: number) {
 }
 
 export function getAllContent() {
-  return fetch('/api/nb/get_content_tree', {
-    method: 'GET'
-  }).then(res => res.json()).then((data) => {
+  return get<{data: any}>('/api/nb/get_content_tree').then((data) => {
     console.log('目录数据', data.data);
     return data.data;
   })
 }
 
 export function getFileList() {
-  return fetch('/api/nb/get_content_list', {
-    method: 'GET'
-  }).then(res => res.json()).then((data) => {
+  return get<IRes>('/api/nb/get_content_list').then((data) => {
     console.log('目录数据', data.data);
     return data.data;
   })

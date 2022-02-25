@@ -42,6 +42,9 @@ export function initContent () {
     }
   });
 
+  // $dom(IDS.TreeContent)!.addEventListener('drag', (e) => {
+  // });
+
   $dom(IDS.TreeContent)!.addEventListener('click', (e) => {
     const element = e.target as HTMLElement;
     if (element.className.match('triangle') !== null) {

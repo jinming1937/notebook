@@ -10,14 +10,20 @@
   <div id="page">
     <div class="box">
       <div class="content" id="content">
-        <ul class="treeContent" id="treeContent"></ul>
+        <div class="treeContent">
+          <div class="contentHead">
+            <input type="button" value="锁定" id="logout">
+            <input type="button" value="添加目录" id="addContent">
+            <input type="button" value="添加文件" id="addFile">
+          </div>
+          <ul class="treeContentBox" id="treeContent"></ul>
+        </div>
         <div class="activeBarMask" id="activeBarMask">
           <div class="targetBar" id="targetBar"></div>
         </div>
         <div class="fileContent">
           <div class="fileTitle">
-            <input type="button" value="添加目录" id="addContent">
-            <input type="button" value="添加文件" id="addFile">
+            <input tabindex="0" type="text" value="" id="title" placeholder="请输入30字以内的标题" maxlength="30" />
           </div>
           <ul class="fileList" id="fileList"></ul>
         </div>
@@ -25,8 +31,6 @@
       <div class="editor">
         <div class="toolBar">
           <input type="button" id="down" value="导出" />
-          |
-          <input tabindex="0" type="text" value="" id="title" placeholder="请输入12字以内的标题" maxlength="12" />
           |
           <label for="theme">dark</label>
           <input type="checkbox" name="theme" id="theme">
@@ -44,6 +48,16 @@
           <label>
             <a class="linkBtn">h1</a>
             <a class="linkBtn">h2</a>
+            <a class="linkBtn">h3</a>
+            <a class="linkBtn">h4</a>
+            <a class="linkBtn">h5</a>
+            <a class="linkBtn">h6</a>
+            <a class="linkBtn">Link</a>
+            <a class="linkBtn">列表</a>
+            <a class="linkBtn">删除</a>
+            <a class="linkBtn">高亮</a>
+            <a class="linkBtn">加粗</a>
+            <a class="linkBtn">下划线</a>
           </label>
         </div>
         <div class="editorContent">
@@ -55,6 +69,15 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+  <div id="mask" class="mask hidden">
+    <div class="login">
+      <p>为了安全起见，需要输入口令：</p>
+      <p>
+        <input type="password" value="" id="pwd">
+        <input type="button" id="login" value="登录">
+      </p>
     </div>
   </div>
 </body>

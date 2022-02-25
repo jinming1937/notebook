@@ -4,6 +4,15 @@ import { getFile } from './net/file';
 import { getFileList } from './net/content';
 import { IContent } from './entity/common';
 
+function timeTheme() {
+  const bgFlag = ($parentDom('theme') as HTMLInputElement)!.checked
+  if (bgFlag) {
+    $dom('frameBox')!.className = 'frameBox dark';
+  } else {
+    $dom('frameBox')!.className = 'frameBox light';
+  }
+}
+
 window.onload = (e) => {
   console.log('frame ready');
   // let flag: any = 0;
@@ -19,20 +28,20 @@ window.onload = (e) => {
         // e.source?.postMessage("确认收到消息", {targetOrigin: "http://localhost:8080"});
       }
     });
-    {
-      const bgFlag = ($parentDom('theme') as HTMLInputElement)!.checked
-      if (bgFlag) {
-        $dom('frameBox')!.className = 'frameBox dark';
-      } else {
-        $dom('frameBox')!.className = 'frameBox light';
-      }
-    }
+    timeTheme();
 
     $parentDom('theme')!.addEventListener("change", (e) => {
       if ((e.target as HTMLInputElement).checked) {
         $dom('frameBox')!.className = 'frameBox dark';
       } else {
         $dom('frameBox')!.className = 'frameBox light';
+      }
+    })
+
+    document.addEventListener('visibilitychange', (e) => {
+      if (!(document.hidden)) {
+        console.log('notebook active!!');
+        timeTheme();
       }
     })
   } else {

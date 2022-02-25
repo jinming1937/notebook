@@ -4,7 +4,7 @@ export function initActiveBar() {
   let flag: boolean | null = null;
   $dom(IDS.ActiveBarMask)!.addEventListener('mousedown', (e) => {
     flag = true;
-    $dom(IDS.ActiveBarMask)!.className = 'activeBarMask mask';
+    $dom(IDS.ActiveBarMask)!.className = 'activeBarMask contentMask';
     $dom(IDS.TargetBar)!.style.left = `${e.clientX - 10}px`;
   });
   $dom(IDS.ActiveBarMask)!.addEventListener('mousemove', (e) => {

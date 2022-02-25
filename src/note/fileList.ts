@@ -13,7 +13,7 @@ export function renderFileList(list: IContent[]) {
     if (content.active) {
       classList.push('active');
     }
-    html += `<li key="${content.id}" class="${classList.join(' ').trim()}">${content.name}${suffix}<s index="${index}">删</s></li>`
+    html += `<li key="${content.id}" class="${classList.join(' ').trim()}" title="${content.name}">${content.name}${suffix}<s index="${index}">删</s></li>`
   });
   $dom('fileList')!.innerHTML = html;
 }
@@ -21,5 +21,7 @@ export function renderFileList(list: IContent[]) {
 export function clearFile() {
   $dom<HTMLDivElement>(IDS.FileList)!.innerHTML = '';
   $dom<HTMLInputElement>(IDS.Title)!.value = '';
+  $dom<HTMLInputElement>(IDS.Title)?.blur();
   $dom<HTMLInputElement>(IDS.InputBox)!.value = '';
+  $dom<HTMLInputElement>(IDS.InputBox)?.blur();
 }

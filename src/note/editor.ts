@@ -6,6 +6,7 @@ function timeTheme () {
   const nowHours = new Date().getHours();
   if (nowHours > 6 && nowHours < 18) {
     frame!.className = "light";
+    theme!.checked = false;
   } else {
     frame!.className = "dark";
     theme!.checked = true;
@@ -63,8 +64,8 @@ export function initEditor() {
   registerTheme();
 
   document.addEventListener('visibilitychange', (e) => {
-    console.log(12);
     if (!(document.hidden)) {
+      console.log('notebook active!!');
       timeTheme();
     }
   })
