@@ -19,7 +19,7 @@ export function logout() {
 }
 
 export function login(pwd: string) {
-  return post<IRes>('/api/nb/login', {pwd}).then((data) => {
+  return post<IRes>('/api/nb/login', {pwd, user: 'jm'}).then((data) => {
     return data.data
   })
 }

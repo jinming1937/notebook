@@ -1,5 +1,6 @@
 import { heatBit, login, logout } from "@/net/safe";
 import { $dom, sendToFrame } from "@/util"
+import { renderContentTree } from "./content";
 import { clearFile } from "./fileList";
 
 function animate(callback: () => void, timeGap: number, immediately: boolean) {
@@ -40,6 +41,7 @@ export const initLogin = () => {
         $dom('pwd')?.focus();
         stop();
         clearFile();
+        sender('');
         isLogin = false;
       } else {
         if (!isLogin){ // 登录态正常，但是页面未初始化
@@ -58,6 +60,7 @@ export const initLogin = () => {
           $dom('mask')!.className = 'mask hidden';
           $dom<HTMLInputElement>('pwd')!.value = '';
           isLogin = true;
+          renderContentTree();
           start()
         } else {
           alert('password was wrong!!');

@@ -28,19 +28,26 @@ function renderContent(list: IContent[]) {
   $dom('treeContent')!.innerHTML = html_;
 }
 
-export function initContent () {
-  const list: IContent[] = [];
-  let current: IContent | null = null;
-  let currentFile: IContent | null = null;
-  const sender = sendToFrame()
+const list: IContent[] = [];
+
+export function renderContentTree() {
   // 获取数据
   getAllContent().then((data: IContent) => {
     if (data) {
+      list.length = 0;
       list.push(data);
       ROOT_ID = data.id;
       renderContent(list);
     }
   });
+}
+
+export function initContent () {
+  let current: IContent | null = null;
+  let currentFile: IContent | null = null;
+  const sender = sendToFrame()
+
+  renderContentTree();
 
   // $dom(IDS.TreeContent)!.addEventListener('drag', (e) => {
   // });

@@ -9,6 +9,7 @@ const config = {
   entry: {
     main: ['./src/css/base.less', './src/index.ts'],
     preview: ['./src/css/preview.less', './src/preview.ts'],
+    link: ['./src/link.ts']
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -36,6 +37,11 @@ const config = {
       filename: 'preview.html',
       chunks: ['preview'],
       template: './build/preview.html',
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'link.html',
+      chunks: ['link'],
+      template: './build/link.html',
     })
   ],
   devServer: {
