@@ -4,11 +4,16 @@ function timeTheme () {
   const frame = $dom<HTMLDivElement>("page");
   const theme = $dom<HTMLInputElement>("theme");
   const nowHours = new Date().getHours();
-  if (nowHours > 6 && nowHours < 18) {
-    frame!.className = "light";
+  const className = frame!.className || 'light';
+  // console.log()
+  if ($dom<HTMLInputElement>('upload')!.value) {
+    return;
+  }
+  if (nowHours > 6 && nowHours < 20) {
+    frame!.className = className.replace("dark", "light");
     theme!.checked = false;
   } else {
-    frame!.className = "dark";
+    frame!.className = className.replace("light","dark");
     theme!.checked = true;
   }
 }
@@ -16,10 +21,11 @@ function timeTheme () {
 function registerTheme() {
   const frame = $dom<HTMLDivElement>("page");
   $dom<HTMLInputElement>('theme')!.addEventListener("change", (e) => {
+    const className = frame!.className;
     if ((e.target as HTMLInputElement)!.checked) {
-      frame!.className = "dark";
+      frame!.className = className.replace("light","dark");
     } else {
-      frame!.className = "light";
+      frame!.className = className.replace("dark", "light");
     }
   });
 }
@@ -32,6 +38,7 @@ export function initEditor() {
   const fontSize = $dom<HTMLSelectElement>('fontSize');
   const downDom = $dom<HTMLInputElement>('down');
   const title = $dom<HTMLInputElement>('title');
+  const upload = $dom<HTMLInputElement>('upload')
 
   downDom!.addEventListener('click', () => {
     if (!inputBox!.value || !title!.value) {
@@ -69,4 +76,33 @@ export function initEditor() {
       timeTheme();
     }
   })
+
+  upload!.addEventListener('change', (e: any) => {
+    const value = e.target?.value;
+    if (value) {
+      // 是一张图片
+      const file = e.target?.files[0];
+      // 创建一个新的FileReader对象，用来读取文件信息
+      var reader = new FileReader();
+      // 读取用户上传的图片的路径
+      reader.readAsDataURL(file);
+
+      // 读取完毕之后，将图片的src属性修改成用户上传的图片的本地路径
+      reader.onload = function (ev) {
+        // $('#tipsContent').addClass('hide');
+        console.log('upload success')
+        if (value.toLowerCase().match(/\.(jpe?g|png|gif|webp)$/g)) {
+          // $('#viewVideo').addClass('hide')
+          // $('#viewImage').removeClass('hide').attr('src', reader.target.result);
+          $dom('page')?.setAttribute('style', `background-image: url(${(ev as any).target.result})`);
+          const className = $dom('page')?.className;
+          $dom('page')?.setAttribute('class', className + ' ' + 'backImage');
+        // } else if (value.toLowerCase().match(/\.(mp4|mov)$/g)) {
+          // $('#viewImage').addClass('hide');
+          // $('#viewVideo').removeClass('hide').attr('src', reader.target.result);
+        }
+      }
+    }
+    // upload!.value = '';
+  });
 }

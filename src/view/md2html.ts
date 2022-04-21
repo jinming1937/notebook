@@ -2,28 +2,7 @@
  * MD to HTML
  */
 import { randomNum } from "@/util"
-
-// 匹配开头符号
-const regMark = /^(.+?)\s/
-// 匹配 # 开头
-const regSharp = /^\#/
-// 匹配 无序列表 -
-const regCrossbar = /^\-/
-// 匹配 有序列表 1. 2.
-const regNumber = /^\d/
-// 匹配行内：加粗，删除，下划线，颜色
-const regContent = /([*~+=]{2})(.+?)\1/
-const regGContent = /([*~+=]{2})(.+?)\1/g
-// 行内 map
-const TagMap = {
-  '**': 'strong',
-  '~~': 'del',
-  '++': 'u',
-  '==': 'span',
-}
-// 匹配行内链接
-const regLink = /[\[](.+?)[\]][\(](.+?)[\)]/
-const regGLink = /[\[](.+?)[\]][\(](.+?)[\)]/g
+import { regCodeEnd, regCodeStart, regContent, regCrossbar, regGContent, regGLink, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
 
 function format(content: string) {
   let strHtml = '';
@@ -70,7 +49,9 @@ function formatLine(lineStr: string) {
     [regSharp, regCrossbar, regNumber].forEach((item, index) => {
       // 匹配开头的，所以只会有一个test 成功！
       if (item.test(mark)) {
-        const tag = index === 0 ? `h${mark.length}` : 'li'; // 转换成h1 h2等
+        const tag = index === 0 ? `h${mark.length}`
+          :
+          index === 1 ? 'li' : 'lx'; // 转换成h1 h2等
         const tagContent = input.replace(regMark, "");
 
         const inner = matchInline(tagContent);
@@ -87,10 +68,15 @@ function formatLine(lineStr: string) {
     return [inline, 'p'];
   }
 
-  // if (lineStr.match(/^```/)) {
-  //   console.log('1122');
-  //   return [`<code>`, 'code'];
-  // }
+  if (lineStr.match(regCodeStart)) {
+    console.log('1122');
+    return [`<code>`, 'sCode'];
+  }
+
+  if (lineStr.match(regCodeEnd)) {
+    console.log('1122');
+    return [`</code>`, 'eCode'];
+  }
 
   return [`<div>${lineStr}</div>`, 'div'];
 }
@@ -101,7 +87,7 @@ export function md2HTML(mdStr = '') {
   let htmlObj = {};
   let lastHtmlTag = '';
   let key = 0;
-  strList.forEach((item) => {
+  strList.forEach((item, index) => {
     const [html, tag] = formatLine(item);
     if (!tag) {
       // no tag
@@ -114,6 +100,19 @@ export function md2HTML(mdStr = '') {
         key = randomNum();
         htmlObj[`${lastHtmlTag}-${key}`] = [html];
       }
+    } else if (tag === 'lx') {
+      const __html = html.replace('lx', 'li');
+      if (lastHtmlTag === 'ol') {
+        htmlObj[`${lastHtmlTag}-${key}`].push(__html);
+      } else {
+        lastHtmlTag = 'ol';
+        key = randomNum();
+        htmlObj[`${lastHtmlTag}-${key}`] = [__html];
+      }
+    } else if (tag === 'sCode') {
+      // lastHtmlTag = 'code';
+    } else if (tag === 'eCode') {
+
     } else {
       lastHtmlTag = tag;
       htmlObj[`${tag}-${randomNum()}`] = [html];
@@ -126,6 +125,10 @@ export function md2HTML(mdStr = '') {
     const [tag] = key.split('-');
     if (tag === 'ul') {
       result += `<ul>${htmlObj[key].join('')}</ul>`;
+    } else if (tag === 'ol') {
+      result += `<ol>${htmlObj[key].join('')}</ol>`;
+    } else if (tag) {
+      result += `<${tag}>${htmlObj[key][0]}</${tag}>`
     } else {
       const dom = htmlObj[key][0];
       result += dom;
