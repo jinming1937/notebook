@@ -113,19 +113,28 @@ input[type="text"] {
         }
 
         .triangle {
+          cursor: pointer;
           display: inline-block;
-          border-left: 8px solid rgb(0 207 205);
-          border-bottom: 6px solid transparent;
-          border-top: 6px solid transparent;
+          width: 16px;
+          height: 16px;
           position: absolute;
-          margin: 3px;
-          left: -13px;
+          left: -12px;
           top: 7px;
-          transition: transform 0.3s;
-          transform: rotate(0deg);
+
+          &::after {
+            content: ' ';
+            display: inline-block;
+            border-left: 6px solid #00cfcd;
+            border-bottom: 6px solid transparent;
+            border-top: 6px solid transparent;
+            transition: transform 0.3s;
+            transform: rotate(0deg);
+          }
 
           &.close {
-            transform: rotate(90deg);
+            &::after {
+              transform: rotate(90deg);
+            }
           }
         }
 
@@ -414,4 +423,12 @@ input[type="text"] {
       }
     }
   }
+}
+
+.zixian {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 300px;
+  height: 540px;
 }

@@ -95,8 +95,11 @@ export function initEditor() {
           // $('#viewVideo').addClass('hide')
           // $('#viewImage').removeClass('hide').attr('src', reader.target.result);
           $dom('page')?.setAttribute('style', `background-image: url(${(ev as any).target.result})`);
-          const className = $dom('page')?.className;
-          $dom('page')?.setAttribute('class', className + ' ' + 'backImage');
+          // const className = $dom('page')?.className;
+          // $dom('page')?.setAttribute('class', className + ' ' + 'backImage');
+          if (!$dom('page')?.classList.contains('backImage')) {
+            $dom('page')?.classList.add('backImage');
+          }
         // } else if (value.toLowerCase().match(/\.(mp4|mov)$/g)) {
           // $('#viewImage').addClass('hide');
           // $('#viewVideo').removeClass('hide').attr('src', reader.target.result);
