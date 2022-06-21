@@ -39,8 +39,21 @@ function matchInline(content: string) {
   return formatContent;
 }
 
-function formatLine(lineStr: string) {
+function formatLine(lineStr: string, singleText: boolean) {
   if (lineStr === '') return ['', ''];
+
+  if (lineStr.match(regCodeEnd)) {
+    console.log('1122');
+    return ['', 'eCode'];
+  }
+
+  if (singleText) return [lineStr, 'sCode'];
+
+  if (lineStr.match(regCodeStart)) {
+    console.log('1122');
+    return ['', 'sCode'];
+  }
+
   const matchedTitle = lineStr.match(regMark);
   if (matchedTitle) {
     const mark = matchedTitle[1]
@@ -68,30 +81,22 @@ function formatLine(lineStr: string) {
     return [inline, 'p'];
   }
 
-  if (lineStr.match(regCodeStart)) {
-    console.log('1122');
-    return [`<code>`, 'sCode'];
-  }
-
-  if (lineStr.match(regCodeEnd)) {
-    console.log('1122');
-    return [`</code>`, 'eCode'];
-  }
-
   return [`<div>${lineStr}</div>`, 'div'];
 }
 
 export function md2HTML(mdStr = '') {
-  if (!mdStr) return '';
-  const strList = mdStr.trim().replace(/(^[\r\n]|[\r\n]$)/g, '').split(/[\r\n]/g);
+  if (!mdStr || !(mdStr.trim())) return '';
+  const strList = mdStr.trim().replace(/((^[\r\n])|([\r\n]$))/g, '').split(/[\r\n]/g);
   let htmlObj = {};
   let lastHtmlTag = '';
+  let lastCodeTag = '';
   let key = 0;
   strList.forEach((item, index) => {
-    const [html, tag] = formatLine(item);
+    const [html, tag] = formatLine(item, lastCodeTag === 'code');
     if (!tag) {
       // no tag
       lastHtmlTag = '';
+      lastCodeTag = '';
     } else if (tag === 'li') {
       if (lastHtmlTag === 'ul') {
         htmlObj[`${lastHtmlTag}-${key}`].push(html);
@@ -110,9 +115,15 @@ export function md2HTML(mdStr = '') {
         htmlObj[`${lastHtmlTag}-${key}`] = [__html];
       }
     } else if (tag === 'sCode') {
-      // lastHtmlTag = 'code';
+      if (lastCodeTag === 'code') {
+        htmlObj[`${lastCodeTag}-${key}`].push(`<div>${html}</div>`);
+      } else {
+        lastCodeTag = 'code';
+        key = randomNum();
+        htmlObj[`${lastCodeTag}-${key}`] = [html];
+      }
     } else if (tag === 'eCode') {
-
+      lastCodeTag = '';
     } else {
       lastHtmlTag = tag;
       htmlObj[`${tag}-${randomNum()}`] = [html];
@@ -120,13 +131,15 @@ export function md2HTML(mdStr = '') {
   });
 
   let result = '';
-
+  console.log(htmlObj);
   Object.keys(htmlObj).forEach((key) => {
     const [tag] = key.split('-');
     if (tag === 'ul') {
       result += `<ul>${htmlObj[key].join('')}</ul>`;
     } else if (tag === 'ol') {
       result += `<ol>${htmlObj[key].join('')}</ol>`;
+    } else if (tag === 'code') {
+      result += `<code>${htmlObj[key].join('')}</code>`;
     } else if (tag) {
       result += `<${tag}>${htmlObj[key][0]}</${tag}>`
     } else {

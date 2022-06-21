@@ -6,6 +6,7 @@ export type IContent = {
   type: FileType;
   parent: number;
   active?: boolean;
+  editing?: boolean;
   children?: IContent[];
   readonly?: boolean;
   switch?: boolean;

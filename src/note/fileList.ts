@@ -10,7 +10,7 @@ export function renderFileList(list: IContent[]) {
       suffix += '.md';
       classList.push('file');
     }
-    if (content.active) {
+    if (content.editing) {
       classList.push('active');
     }
     html += `<li key="${content.id}" class="${classList.join(' ').trim()}" title="${content.name}">${content.name}${suffix}<s index="${index}">删</s></li>`

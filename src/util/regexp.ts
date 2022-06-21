@@ -20,5 +20,5 @@ export const TagMap = {
 export const regLink = /[\[](.+?)[\]][\(](.+?)[\)]/
 export const regGLink = /[\[](.+?)[\]][\(](.+?)[\)]/g
 
-export const regCodeStart = /^`{3}[a-zA-Z]+/
-export const regCodeEnd = /^`{3}\$/
+export const regCodeStart = /^`{3}[a-zA-Z]*/
+export const regCodeEnd = /^`{3}$/
