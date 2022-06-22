@@ -2,14 +2,15 @@
  * MD to HTML
  */
 import { randomNum } from "@/util"
-import { regCodeEnd, regCodeStart, regContent, regCrossbar, regGContent, regGLink, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
+import { regCodeEnd, regCodeStart, regContent, regCrossbar, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
 
 function format(content: string) {
   let strHtml = '';
-  [regContent, regLink].forEach((item) => {
+  [regContent, regLink, regImg].forEach((item) => {
     const result = content.match(item);
     if (result) {
       const tag = result[1]
+      console.log(result, tag);
       const textOrLink = result[2]
       const index = result.index || 0;
 
@@ -19,7 +20,11 @@ function format(content: string) {
       if (TagMap[tag]) {
         strHtml = `${prefix}<${TagMap[tag]}>${textOrLink}</${TagMap[tag]}>${suffix}`;
       } else {
-        strHtml = `${prefix}<a href="${textOrLink}" target="_blank">${tag}</a>${suffix}`;
+        if (result.input?.match(/^\!/)) {
+          strHtml = `${prefix.replace(/\!$/, '')}<img src="${textOrLink}" alt="${tag}" />${suffix}`;
+        } else {
+          strHtml = `${prefix}<a href="${textOrLink}" target="_blank">${tag}</a>${suffix}`;
+        }
       }
     }
   });
@@ -28,7 +33,7 @@ function format(content: string) {
 
 function matchInline(content: string) {
   let formatContent = content;
-  [regGContent, regGLink].forEach((item) => {
+  [regGContent, regGLink, regGImg].forEach((item) => {
     const result = content.match(item);
     if (Array.isArray(result)) {
       result.forEach((time) => {
@@ -120,7 +125,7 @@ export function md2HTML(mdStr = '') {
       } else {
         lastCodeTag = 'code';
         key = randomNum();
-        htmlObj[`${lastCodeTag}-${key}`] = [html];
+        htmlObj[`${lastCodeTag}-${key}`] = [];
       }
     } else if (tag === 'eCode') {
       lastCodeTag = '';
@@ -131,7 +136,7 @@ export function md2HTML(mdStr = '') {
   });
 
   let result = '';
-  console.log(htmlObj);
+  // console.log(htmlObj);
   Object.keys(htmlObj).forEach((key) => {
     const [tag] = key.split('-');
     if (tag === 'ul') {

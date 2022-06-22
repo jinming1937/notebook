@@ -17,8 +17,10 @@ export const TagMap = {
   '==': 'span',
 }
 // 匹配行内链接
-export const regLink = /[\[](.+?)[\]][\(](.+?)[\)]/
-export const regGLink = /[\[](.+?)[\]][\(](.+?)[\)]/g
+export const regLink = /(?<!\!)[\[](.+?)[\]][\(](.+?)[\)]/
+export const regImg = /(?<=\!)[\[](.+?)[\]][\(](.+?)[\)]/
+export const regGLink = /(?<!\!)[\[](.+?)[\]][\(](.+?)[\)]/g
+export const regGImg = /(?<=\!)[\[](.+?)[\]][\(](.+?)[\)]/g
 
 export const regCodeStart = /^`{3}[a-zA-Z]*/
 export const regCodeEnd = /^`{3}$/
