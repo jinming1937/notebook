@@ -3,6 +3,11 @@
  */
 import { randomNum } from "@/util"
 import { regCodeEnd, regCodeStart, regContent, regCrossbar, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
+import { saveWords } from "@/util/keyWords";
+
+function superCodeColor(content: string) {
+  return content;
+}
 
 function format(content: string) {
   let strHtml = '';
@@ -10,7 +15,6 @@ function format(content: string) {
     const result = content.match(item);
     if (result) {
       const tag = result[1]
-      console.log(result, tag);
       const textOrLink = result[2]
       const index = result.index || 0;
 
@@ -44,20 +48,21 @@ function matchInline(content: string) {
   return formatContent;
 }
 
-function formatLine(lineStr: string, singleText: boolean) {
-  if (lineStr === '') return ['', ''];
+function formatLine(lineStr: string, codeText: boolean) {
 
   if (lineStr.match(regCodeEnd)) {
     console.log('1122');
     return ['', 'eCode'];
   }
 
-  if (singleText) return [lineStr, 'sCode'];
+  if (codeText) return [superCodeColor(lineStr), 'sCode'];
 
   if (lineStr.match(regCodeStart)) {
     console.log('1122');
     return ['', 'sCode'];
   }
+
+  if (lineStr === '') return ['', ''];
 
   const matchedTitle = lineStr.match(regMark);
   if (matchedTitle) {
@@ -136,7 +141,7 @@ export function md2HTML(mdStr = '') {
   });
 
   let result = '';
-  // console.log(htmlObj);
+  console.log(htmlObj);
   Object.keys(htmlObj).forEach((key) => {
     const [tag] = key.split('-');
     if (tag === 'ul') {
@@ -144,14 +149,29 @@ export function md2HTML(mdStr = '') {
     } else if (tag === 'ol') {
       result += `<ol>${htmlObj[key].join('')}</ol>`;
     } else if (tag === 'code') {
-      result += `<code>${htmlObj[key].join('')}</code>`;
+      const tBody = htmlObj[key].map((item: string, index: number) => {
+        return `<tr><td class="codeNo">${index + 1}</td><td class="codeText">${item}</td></tr>`;
+      }).join('');
+      const table = `
+        <table class="code">
+          <colgroup>
+            <col width="30">
+            <col>
+          </colgroup>
+          <tbody>
+            ${tBody}
+          </tbody>
+        </table>
+      `
+      result += table;
     } else if (tag) {
-      result += `<${tag}>${htmlObj[key][0]}</${tag}>`
+      result += `${htmlObj[key][0]}`
     } else {
       const dom = htmlObj[key][0];
       result += dom;
     }
   })
+  console.log(result);
 
   return result;
 }

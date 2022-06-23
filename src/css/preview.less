@@ -17,16 +17,29 @@ p {
   line-height: 20px;
 }
 
-code {
+.code {
   display: block;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #c2c2c2;
   border-radius: 4px;
   margin: 10px 0;
-  padding: 5px;
+  border-collapse: collapse;
+
+  .codeNo {
+    text-align: right;
+    color: #fff;
+    background-color: #f0f0f0;
+    padding: 0 3px;
+    border-right: 1px solid #c2c2c2;
+  }
+
+  .codeText {
+    padding-left: 12px;
+    color: #fff;
+  }
 }
 
 img {
-  width: 100%;
+  max-width: 100%;
 }
 
 .frameBox {
@@ -68,8 +81,17 @@ img {
     color: #9acbff;
   }
 
-  code {
+  .code {
     background: #343434;
+
+    .codeNo {
+      color: #fff;
+      background-color: #afafaf;
+    }
+
+    .codeText {
+      color: #fff;
+    }
   }
 }
 
@@ -80,7 +102,15 @@ img {
     color: #1184ff;
   }
 
-  code {
-    background: #d6d6d6;
+  .code {
+    background: rgba(221, 221, 221, 0.6);
+
+    .codeNo {
+      color: #333;
+    }
+
+    .codeText {
+      color: #333;
+    }
   }
 }
