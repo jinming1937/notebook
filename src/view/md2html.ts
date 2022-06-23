@@ -2,32 +2,16 @@
  * MD to HTML
  */
 import { randomNum } from "@/util"
+import { regCodeEnd, regCodeStart, regContent, regCrossbar, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
+import { saveWords } from "@/util/keyWords";
 
-// 匹配开头符号
-const regMark = /^(.+?)\s/
-// 匹配 # 开头
-const regSharp = /^\#/
-// 匹配 无序列表 -
-const regCrossbar = /^\-/
-// 匹配 有序列表 1. 2.
-const regNumber = /^\d/
-// 匹配行内：加粗，删除，下划线，颜色
-const regContent = /([*~+=]{2})(.+?)\1/
-const regGContent = /([*~+=]{2})(.+?)\1/g
-// 行内 map
-const TagMap = {
-  '**': 'strong',
-  '~~': 'del',
-  '++': 'u',
-  '==': 'span',
+function superCodeColor(content: string) {
+  return content;
 }
-// 匹配行内链接
-const regLink = /[\[](.+?)[\]][\(](.+?)[\)]/
-const regGLink = /[\[](.+?)[\]][\(](.+?)[\)]/g
 
 function format(content: string) {
   let strHtml = '';
-  [regContent, regLink].forEach((item) => {
+  [regContent, regLink, regImg].forEach((item) => {
     const result = content.match(item);
     if (result) {
       const tag = result[1]
@@ -40,7 +24,11 @@ function format(content: string) {
       if (TagMap[tag]) {
         strHtml = `${prefix}<${TagMap[tag]}>${textOrLink}</${TagMap[tag]}>${suffix}`;
       } else {
-        strHtml = `${prefix}<a href="${textOrLink}" target="_blank">${tag}</a>${suffix}`;
+        if (result.input?.match(/^\!/)) {
+          strHtml = `${prefix.replace(/\!$/, '')}<img src="${textOrLink}" alt="${tag}" />${suffix}`;
+        } else {
+          strHtml = `${prefix}<a href="${textOrLink}" target="_blank">${tag}</a>${suffix}`;
+        }
       }
     }
   });
@@ -49,7 +37,7 @@ function format(content: string) {
 
 function matchInline(content: string) {
   let formatContent = content;
-  [regGContent, regGLink].forEach((item) => {
+  [regGContent, regGLink, regGImg].forEach((item) => {
     const result = content.match(item);
     if (Array.isArray(result)) {
       result.forEach((time) => {
@@ -60,8 +48,22 @@ function matchInline(content: string) {
   return formatContent;
 }
 
-function formatLine(lineStr: string) {
+function formatLine(lineStr: string, codeText: boolean) {
+
+  if (lineStr.match(regCodeEnd)) {
+    console.log('1122');
+    return ['', 'eCode'];
+  }
+
+  if (codeText) return [superCodeColor(lineStr), 'sCode'];
+
+  if (lineStr.match(regCodeStart)) {
+    console.log('1122');
+    return ['', 'sCode'];
+  }
+
   if (lineStr === '') return ['', ''];
+
   const matchedTitle = lineStr.match(regMark);
   if (matchedTitle) {
     const mark = matchedTitle[1]
@@ -70,7 +72,9 @@ function formatLine(lineStr: string) {
     [regSharp, regCrossbar, regNumber].forEach((item, index) => {
       // 匹配开头的，所以只会有一个test 成功！
       if (item.test(mark)) {
-        const tag = index === 0 ? `h${mark.length}` : 'li'; // 转换成h1 h2等
+        const tag = index === 0 ? `h${mark.length}`
+          :
+          index === 1 ? 'li' : 'lx'; // 转换成h1 h2等
         const tagContent = input.replace(regMark, "");
 
         const inner = matchInline(tagContent);
@@ -87,25 +91,22 @@ function formatLine(lineStr: string) {
     return [inline, 'p'];
   }
 
-  // if (lineStr.match(/^```/)) {
-  //   console.log('1122');
-  //   return [`<code>`, 'code'];
-  // }
-
   return [`<div>${lineStr}</div>`, 'div'];
 }
 
 export function md2HTML(mdStr = '') {
-  if (!mdStr) return '';
-  const strList = mdStr.trim().replace(/(^[\r\n]|[\r\n]$)/g, '').split(/[\r\n]/g);
+  if (!mdStr || !(mdStr.trim())) return '';
+  const strList = mdStr.trim().replace(/((^[\r\n])|([\r\n]$))/g, '').split(/[\r\n]/g);
   let htmlObj = {};
   let lastHtmlTag = '';
+  let lastCodeTag = '';
   let key = 0;
-  strList.forEach((item) => {
-    const [html, tag] = formatLine(item);
+  strList.forEach((item, index) => {
+    const [html, tag] = formatLine(item, lastCodeTag === 'code');
     if (!tag) {
       // no tag
       lastHtmlTag = '';
+      lastCodeTag = '';
     } else if (tag === 'li') {
       if (lastHtmlTag === 'ul') {
         htmlObj[`${lastHtmlTag}-${key}`].push(html);
@@ -114,6 +115,25 @@ export function md2HTML(mdStr = '') {
         key = randomNum();
         htmlObj[`${lastHtmlTag}-${key}`] = [html];
       }
+    } else if (tag === 'lx') {
+      const __html = html.replace('lx', 'li');
+      if (lastHtmlTag === 'ol') {
+        htmlObj[`${lastHtmlTag}-${key}`].push(__html);
+      } else {
+        lastHtmlTag = 'ol';
+        key = randomNum();
+        htmlObj[`${lastHtmlTag}-${key}`] = [__html];
+      }
+    } else if (tag === 'sCode') {
+      if (lastCodeTag === 'code') {
+        htmlObj[`${lastCodeTag}-${key}`].push(`<div>${html}</div>`);
+      } else {
+        lastCodeTag = 'code';
+        key = randomNum();
+        htmlObj[`${lastCodeTag}-${key}`] = [];
+      }
+    } else if (tag === 'eCode') {
+      lastCodeTag = '';
     } else {
       lastHtmlTag = tag;
       htmlObj[`${tag}-${randomNum()}`] = [html];
@@ -121,16 +141,37 @@ export function md2HTML(mdStr = '') {
   });
 
   let result = '';
-
+  console.log(htmlObj);
   Object.keys(htmlObj).forEach((key) => {
     const [tag] = key.split('-');
     if (tag === 'ul') {
       result += `<ul>${htmlObj[key].join('')}</ul>`;
+    } else if (tag === 'ol') {
+      result += `<ol>${htmlObj[key].join('')}</ol>`;
+    } else if (tag === 'code') {
+      const tBody = htmlObj[key].map((item: string, index: number) => {
+        return `<tr><td class="codeNo">${index + 1}</td><td class="codeText">${item}</td></tr>`;
+      }).join('');
+      const table = `
+        <table class="code">
+          <colgroup>
+            <col width="30">
+            <col>
+          </colgroup>
+          <tbody>
+            ${tBody}
+          </tbody>
+        </table>
+      `
+      result += table;
+    } else if (tag) {
+      result += `${htmlObj[key][0]}`
     } else {
       const dom = htmlObj[key][0];
       result += dom;
     }
   })
+  console.log(result);
 
   return result;
 }

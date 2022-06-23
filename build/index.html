@@ -59,13 +59,14 @@
             <a class="linkBtn">加粗</a>
             <a class="linkBtn">下划线</a>
           </label>
+          <input placeholder="上传背景" type="file" id="upload" accept=".jpg,.png,.webp"/>
         </div>
         <div class="editorContent">
           <div class="editorInput">
             <textarea tabindex="1" class="inputBox" id="inputBox" cols="30" rows="90" maxlength="2700"></textarea>
           </div>
           <div class="preview">
-            <iframe id="frameDom">浏览器不支持IFrame，无法正确显示内容</iframe>
+            <iframe id="frameDom" sandbox="allow-same-origin allow-scripts">浏览器不支持IFrame，无法正确显示内容</iframe>
           </div>
         </div>
       </div>
@@ -80,5 +81,6 @@
       </p>
     </div>
   </div>
+  <iframe class="zixian" sandbox="allow-same-origin allow-scripts" src="http://localhost:9999/static/katun/index.html" />
 </body>
 </html>

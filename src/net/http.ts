@@ -9,7 +9,7 @@ export interface IConfig {
 
 export type IKeys = {[key: string]: string | number}
 
-export type IRes = {data: any};
+export type IRes<T> = {data: T};
 
 function obj2Url(obj: IKeys) {
   let strParams = '';

@@ -27,5 +27,13 @@ export const IDS = {
   /**
    * 正文输入
    */
-  InputBox: 'inputBox'
+  InputBox: 'inputBox',
+  /**
+   * 添加文件
+   */
+  AddFile: 'addFile',
+  /**
+   * 添加文件
+   */
+   AddContent: 'addContent',
 }

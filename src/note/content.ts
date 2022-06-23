@@ -4,35 +4,15 @@ import { saveFile } from "../net/file";
 import { $dom, debounce, getItemById, IDS, randomNumber, sendToFrame } from "../util";
 import { readFile } from "./doc";
 import { clearFile, renderFileList } from "./fileList";
+import { setLocalContent, removeLocalContent } from './local';
+import { renderContent } from './contentTree';
+
 let ROOT_ID = -1;
-
-const icon = (state: boolean | undefined) => `<span class="file_icon ${state ? 'open': 'close'}"></span>`;
-const triangle = (state: boolean | undefined) => `<span class="triangle ${!state ? '' : 'close'}"></span>`;
-function createContentTree (list: IContent[]) {
-  let html = ''
-  list.forEach((content: IContent) => {
-    content.switch = typeof content.switch === 'undefined' ? true: content.switch;
-    if (content.children && content.children.length > 0 && content.children.filter(item => item.type === 'content').length > 0) {
-      const cache = `<ul class="subMenu ${content.switch ? '' : 'hidden'}">${createContentTree(content.children)}</ul>`;
-      html+= `<li><div key="${content.id}" class="${content.active ? 'active': ''}">${triangle(content.switch)}${icon(content.switch)}<span>${content.name}</span></div>${cache}</li>`
-    } else if (content.type === 'content') {
-      html += `<li class="${content.active ? 'active': ''}" key="${content.id}">${icon(false)}<span>${content.name}</span></li>`
-    }
-  });
-
-  return html;
-}
-
-function renderContent(list: IContent[]) {
-  const html_ = createContentTree(list);
-  $dom('treeContent')!.innerHTML = html_;
-}
-
 const list: IContent[] = [];
 
 export function renderContentTree() {
   // 获取数据
-  getAllContent().then((data: IContent) => {
+  getAllContent<IContent>().then((data: IContent) => {
     if (data) {
       list.length = 0;
       list.push(data);
@@ -49,9 +29,6 @@ export function initContent () {
 
   renderContentTree();
 
-  // $dom(IDS.TreeContent)!.addEventListener('drag', (e) => {
-  // });
-
   $dom(IDS.TreeContent)!.addEventListener('click', (e) => {
     const element = e.target as HTMLElement;
     if (element.className.match('triangle') !== null) {
@@ -59,9 +36,15 @@ export function initContent () {
       const item = getItemById(parseInt(id), list);
       item!.switch = !item?.switch;
       const parentDom = document.querySelector(`[key="${id}"]`);
-      parentDom!.querySelector('.triangle')!.className = `triangle ${item?.switch ? 'close': ''}`;
+      const close = item?.switch ? 'close': '';
+      parentDom!.querySelector('.triangle')!.className = `triangle ${close}`;
       parentDom!.querySelector('.file_icon')!.className = `file_icon ${item?.switch ? 'open': 'close'}`;
       parentDom!.parentElement!.querySelector('.subMenu')!.className = `subMenu ${item?.switch ? '' : 'hidden' }`;
+      if (!close) {
+        setLocalContent(id);
+      } else {
+        removeLocalContent(id);
+      }
       return;
     }
     $dom(IDS.TreeContent)!.querySelectorAll('[key]').forEach((target) => {
@@ -82,7 +65,7 @@ export function initContent () {
       current = null;
     }
     if (currentFile) {
-      currentFile.active = false;
+      currentFile.editing = false;
       currentFile = null;
     }
     const keyElement = element.getAttribute('key') ? element : element.parentElement;
@@ -121,8 +104,8 @@ export function initContent () {
           current.children = [currentFile];
         }
       }
-      currentFile.active = true;
-      addContent(currentFile.name, currentFile.type, currentFile.parent).then((data) => {
+      currentFile.editing = true;
+      addContent<{id: number}>(currentFile.name, currentFile.type, currentFile.parent).then((data) => {
         if (data.id) {
           currentFile!.id = data.id;
           renderFileList(current?.children || []);
@@ -155,7 +138,7 @@ export function initContent () {
         name: '新建文件',
         id: randomNumber(),
         type: 'file',
-        active: true,
+        editing: true,
       } as IContent;
       if (!current) {
         current = getItemById(ROOT_ID, list);
@@ -172,7 +155,7 @@ export function initContent () {
           current.children = [currentFile];
         }
       }
-      addContent(currentFile.name, currentFile.type, currentFile.parent).then((data) => {
+      addContent<{id: number}>(currentFile.name, currentFile.type, currentFile.parent).then((data) => {
         console.log(data);
         if (data.id) {
           currentFile!.id = data.id;
@@ -184,7 +167,7 @@ export function initContent () {
       });
     } else {
       currentFile.name = (e.target as HTMLInputElement).value
-      currentFile.active = true;
+      currentFile.editing = true;
       if (!current) {
         current = getItemById(ROOT_ID, list);
         if (current) {
@@ -194,7 +177,7 @@ export function initContent () {
       debounce(() => {
         changeContentTitle(currentFile!.name, currentFile!.id).then((data) => {
           if (data) {
-            console.log('success')
+            console.log('success');
             renderContent(list);
             renderFileList(current?.children || []);
           }
@@ -217,7 +200,10 @@ export function initContent () {
       }
       if (parentNode && parentNode.children) {
         if (current) current = parentNode;
-        if (currentFile) currentFile = null;
+        if (currentFile) {
+          currentFile = null;
+          $dom<HTMLInputElement>(IDS.Title)!.value = '';
+        }
         parentNode.children.splice(parseInt(index), 1);
 
         removeContent(id).then((data) => {
@@ -235,14 +221,14 @@ export function initContent () {
       target.className = target.className?.replace('active', '').trim();
     });
     if (currentFile) {
-      currentFile.active = false;
+      currentFile.editing = false;
     }
     const itemKey = element.getAttribute('key');
     if (itemKey) {
       const item = getItemById(parseInt(itemKey), list);
       if (item) {
         currentFile = item;
-        currentFile.active = true;
+        currentFile.editing = true;
         renderFileList(current?.children || []);
         readFile(currentFile);
       }
@@ -250,11 +236,12 @@ export function initContent () {
     }
   });
 
-  $dom('addFile')!.addEventListener('click', (e) => {
+  $dom(IDS.AddFile)!.addEventListener('click', (e) => {
     const newFile = {
       name: '新建文件',
       id: randomNumber(),
       type: 'file',
+      editing: true,
     };
     if (current) {
       (newFile as IContent).parent = current.id;
@@ -264,16 +251,19 @@ export function initContent () {
         current.children = [(newFile as IContent)];
       }
       if (currentFile) {
-        currentFile.active = false;
+        currentFile.editing = false;
         currentFile = null;
         currentFile = newFile as IContent;
-        currentFile.active = true;
+        currentFile.editing = true;
+      } else {
+        currentFile = newFile as IContent;
       }
-      addContent(newFile.name, newFile.type as FileType, current.id).then((data) => {
+      addContent<{id: number}>(newFile.name, newFile.type as FileType, current.id).then((data) => {
         console.log(data);
         if (data.id) {
           newFile.id = data.id;
           renderFileList(current?.children || []);
+          $dom<HTMLInputElement>(IDS.Title)!.value = newFile.name;
         } else {
           console.log('error', data);
         }
@@ -282,7 +272,7 @@ export function initContent () {
       alert('error !!! not found root!!!');
     }
   });
-  $dom('addContent')!.addEventListener('click', (e) => {
+  $dom(IDS.AddContent)!.addEventListener('click', (e) => {
     const newContent = {
       name: '新建目录',
       id: randomNumber(),
@@ -306,7 +296,7 @@ export function initContent () {
         return;
       }
     }
-    addContent(newContent.name, newContent.type as FileType, current?.id || ROOT_ID).then((data) => {
+    addContent<{id: number}>(newContent.name, newContent.type as FileType, current?.id || ROOT_ID).then((data) => {
       console.log(data);
       if (data.id) {
         newContent.id = data.id;

@@ -1,19 +1,21 @@
 import {FileType} from "@/entity/common";
-import { get, IRes, post } from "./http";
+import {get, IRes, post} from "./http";
 
-export function addContent(name: string, type: FileType, parentId: number) {
-  return post<IRes>('/api/nb/add_content', {name, type, parent_id: parentId}).then((res) => {
+export function addContent<T>(name: string, type: FileType, parentId: number) {
+  return post<IRes<T>>('/api/nb/add_content', {name, type, parent_id: parentId}).then((res) => {
     return res.data;
   }).catch((err) => {
     console.log(err);
+    return {id: 0};
   })
 }
 
-export function removeContent(id: string) {
-  return post<IRes>('/api/nb/remove_content', {id}).then((res) => {
+export function removeContent<T>(id: string) {
+  return post<IRes<T>>('/api/nb/remove_content', {id}).then((res) => {
     return res.data;
   }).catch((err) => {
     console.log(err);
+    return null;
   })
 }
 
@@ -22,18 +24,19 @@ export function changeContentTitle(name: string, id: number) {
     return res.data;
   }).catch((err) => {
     console.log(err);
+    return {data: null};
   })
 }
 
-export function getAllContent() {
-  return get<{data: any}>('/api/nb/get_content_tree').then((data) => {
+export function getAllContent<T>() {
+  return get<IRes<T>>('/api/nb/get_content_tree').then((data) => {
     console.log('目录数据', data.data);
     return data.data;
   })
 }
 
-export function getFileList() {
-  return get<IRes>('/api/nb/get_content_list').then((data) => {
+export function getFileList<T>() {
+  return get<IRes<T>>('/api/nb/get_content_list').then((data) => {
     console.log('目录数据', data.data);
     return data.data;
   })
