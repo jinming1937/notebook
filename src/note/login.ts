@@ -31,11 +31,12 @@ function animate(callback: () => void, timeGap: number, immediately: boolean) {
   return [start, stop];
 }
 
-export const initLogin = () => {
+export const initLogin = (cb?: () => void) => {
   let isLogin = false;
   const sender = sendToFrame()
   const [start, stop] = animate(() => {
     heatBit().then((data) => {
+      console.log(data);
       if (data !== 0) { // 登录态过期
         $dom('mask')!.className = 'mask';
         $dom('pwd')?.focus();
@@ -43,10 +44,12 @@ export const initLogin = () => {
         clearFile();
         sender('');
         isLogin = false;
+        cb && cb();
       } else {
         if (!isLogin){ // 登录态正常，但是页面未初始化
           isLogin = true;
           $dom('mask')!.className = 'mask hidden';
+          cb && cb();
         }
       }
     });
@@ -60,8 +63,8 @@ export const initLogin = () => {
           $dom('mask')!.className = 'mask hidden';
           $dom<HTMLInputElement>('pwd')!.value = '';
           isLogin = true;
-          renderContentTree();
           start()
+          renderContentTree();
         } else {
           alert('password was wrong!!');
         }
@@ -93,7 +96,7 @@ export const initLogin = () => {
   });
 
   document.addEventListener('visibilitychange', (e) => {
-    if (!isLogin) return;
+    // if (!isLogin) return;
     if (document.hidden) {
       // 停止
       stop();

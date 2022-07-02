@@ -13,3 +13,15 @@ export function getFile<T>(id: number) {
     return data.data;
   })
 }
+
+export function getFileById<T>(id: string) {
+  return get<IRes<T>>(`/api/nb/get_file_by_file_id?id=${id}`).then((data) => {
+    return data.data;
+  })
+}
+
+export function searchFileByKey<T>(key: string) {
+  return get<IRes<T>>(`/api/nb/search?key=${key}`).then((data) => {
+    return data.data;
+  })
+}

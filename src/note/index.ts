@@ -1,5 +1,5 @@
 import { initActiveBar } from "./activeSide";
-import { initContent } from "./content";
+import { initContent, renderContentTree } from "./content";
 import { initEditor } from "./editor";
 import { initLogin } from "./login";
 
@@ -11,5 +11,7 @@ export function initNote() {
   // 目录调整宽度
   initActiveBar();
   // 安全管理
-  initLogin();
+  initLogin(() => {
+    renderContentTree();
+  });
 }

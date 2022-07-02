@@ -1,38 +1,44 @@
-// import {md2HTML} from './view/md2html';
-import { $dom, $parentDom } from './util';
-// import { getFile } from './net/file';
-import { getFileList } from './net/content';
-import { IContent } from './entity/common';
+import { $dom, sendToFrame } from './util';
+import { initLogin } from './note/login';
+import { getFileById, searchFileByKey } from './net/file';
+import { registerTheme, setBg } from './note/editor';
 
 window.addEventListener('load', () => {
   console.log('load ready');
+  const sender = sendToFrame();
 
-  getFileList<IContent[]>().then((data: IContent[]) =>  {
-    if (Array.isArray(data) && data.length > 0) {
-      data.forEach((item) => {
-        if (item.type === 'file') {
-          const option = document.createElement('option');
-          option.innerText = item.name;
-          option.value = String(item.id);
-          console.log(item);
-          $dom('fileContent')!.appendChild(option);
-        }
-      })
+  $dom<HTMLIFrameElement>('frameDom')!.src = './preview.html';
+
+  // 安全管理
+  initLogin(() => {});
+
+  registerTheme();
+  setBg();
+
+  $dom('search')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const key = (e.target as HTMLInputElement).value;
+      if (key) {
+        searchFileByKey<{id: number; content: string}[]>(key).then((data) => {
+          if (Array.isArray(data)) {
+            let html = '';
+            data.forEach((item) => {
+              html += `<li key="${item.id}">${item.content.slice(0, 30)}...</li>`;
+            })
+            $dom<HTMLUListElement>('searchResult')!.innerHTML = html;
+          }
+        });
+      }
+    }
+  });
+
+  $dom<HTMLUListElement>('searchResult')?.addEventListener('click', (e) => {
+    const dom = e.target;
+    if (dom && (dom as HTMLLIElement).getAttribute('key')?.match(/\d+/)) {
+      const id = (dom as HTMLLIElement).getAttribute('key') || '';
+      getFileById<{content: string}>(id).then((data) => {
+        sender(data ? data.content : '')
+      });
     }
   })
-
-  // $dom('hiddenHeader')!.className = 'selectHeader';
-  // $dom('frameBox')!.className = 'frameBox viewPage';
-  // $dom('fileContent')!.addEventListener('change', (e) => {
-  //   const id = (e.target as HTMLSelectElement)?.value;
-  //   if (id && id !== '-1') {
-  //     getFile(parseInt(id)).then((data) => {
-  //       if (data) {
-  //         $dom('frameBox')!.innerHTML = md2HTML(data.content || '');
-  //       } else {
-  //         $dom('frameBox')!.innerHTML = md2HTML('');
-  //       }
-  //     });
-  //   }
-  // })
 });

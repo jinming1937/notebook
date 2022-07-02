@@ -9,7 +9,7 @@ const config = {
   entry: {
     main: ['./src/css/base.less', './src/index.ts'],
     preview: ['./src/css/preview.less', './src/preview.ts'],
-    link: ['./src/link.ts']
+    link: ['./src/css/link.less', './src/link.ts']
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

@@ -1,0 +1,146 @@
+@import './origin.less';
+
+.page {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-size: 14px;
+
+  .toolBar {
+    height: 36px;
+    line-height: 36px;
+    padding: 0 12px;
+  }
+
+  .content {
+    display: flex;
+    height: calc(100% - 36px);
+    padding-bottom: 12px;
+    border-top: 1px solid #999;
+
+    .searchResultBox {
+      width: 500px;
+      height: 100%;
+      padding: 12px 12px 0;
+      border-right: 1px solid #999;
+
+      .searchResult {
+        li {
+          line-height: 24px;
+          cursor: pointer;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+
+    .preview {
+      flex: 1;
+      padding: 12px 12px 0;
+      > iframe {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}
+
+.mask {
+  position: absolute;
+  background: rgb(191 191 191 / 40%);
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+
+  .login {
+    width: 250px;
+    background: #fff;
+    border-radius: 4px;
+    height: 90px;
+    padding: 12px;
+    top: calc(50% - 90px);
+    left: calc(50% - 125px);
+    position: absolute;
+
+    p {
+      margin: 0;
+      color: #333;
+      line-height: 30px;
+      text-align: center;
+
+      input {
+        height: 24px;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+
+.dark {
+  background-color: #222;
+
+  .content {
+    color: #eee;
+
+    .treeContent {
+      li .file_icon {
+        &.open {
+          background: url(../img/open1.png) no-repeat center center;
+          background-size: 16px 16px;
+        }
+        &.close {
+          background: url(../img/close1.png) no-repeat center center;
+          background-size: 16px 16px;
+        }
+      }
+    }
+  }
+  .toolBar {
+    color: #eee;
+    border-bottom: 1px solid #999;
+  }
+  .inputBox {
+    color: #eee;
+  }
+}
+
+.light {
+  background-image: linear-gradient(to right, #fffdc5, #93dcff);
+
+    .toolBar {
+      color: #222;
+    }
+
+    .inputBox {
+      color: #222;
+    }
+
+    .content {
+      color: #222;
+    }
+
+  .treeContent {
+    li .file_icon {
+      &.open {
+        background: url(../img/open.png) no-repeat center center;
+        background-size: 16px 16px;
+      }
+      &.close {
+        background: url(../img/close.png) no-repeat center center;
+        background-size: 16px 16px;
+      }
+    }
+  }
+}
+
+
+.zixian {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 300px;
+  height: 540px;
+}

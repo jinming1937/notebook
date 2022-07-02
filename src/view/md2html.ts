@@ -3,9 +3,9 @@
  */
 import { randomNum } from "@/util"
 import { regCodeEnd, regCodeStart, regContent, regCrossbar, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
-import { saveWords } from "@/util/keyWords";
+import { savedWords } from "@/util/keyWords";
 
-function superCodeColor(content: string) {
+function superCode(content: string) {
   return content;
 }
 
@@ -27,7 +27,7 @@ function format(content: string) {
         if (result.input?.match(/^\!/)) {
           strHtml = `${prefix.replace(/\!$/, '')}<img src="${textOrLink}" alt="${tag}" />${suffix}`;
         } else {
-          strHtml = `${prefix}<a href="${textOrLink}" target="_blank">${tag}</a>${suffix}`;
+          strHtml = `${prefix}<a href="${textOrLink}" target="_blank" ref="noreferrer noopener nofollow">${tag}</a>${suffix}`;
         }
       }
     }
@@ -51,14 +51,12 @@ function matchInline(content: string) {
 function formatLine(lineStr: string, codeText: boolean) {
 
   if (lineStr.match(regCodeEnd)) {
-    console.log('1122');
     return ['', 'eCode'];
   }
 
-  if (codeText) return [superCodeColor(lineStr), 'sCode'];
+  if (codeText) return [superCode(lineStr), 'sCode'];
 
   if (lineStr.match(regCodeStart)) {
-    console.log('1122');
     return ['', 'sCode'];
   }
 
@@ -141,7 +139,6 @@ export function md2HTML(mdStr = '') {
   });
 
   let result = '';
-  console.log(htmlObj);
   Object.keys(htmlObj).forEach((key) => {
     const [tag] = key.split('-');
     if (tag === 'ul') {
@@ -171,7 +168,6 @@ export function md2HTML(mdStr = '') {
       result += dom;
     }
   })
-  console.log(result);
 
   return result;
 }
