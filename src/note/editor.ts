@@ -5,7 +5,6 @@ function timeTheme () {
   const theme = $dom<HTMLInputElement>("theme");
   const nowHours = new Date().getHours();
   const className = frame!.className || 'light';
-  // console.log()
   if ($dom<HTMLInputElement>('upload')!.value) {
     return;
   }
@@ -18,7 +17,7 @@ function timeTheme () {
   }
 }
 
-function registerTheme() {
+export function registerTheme() {
   const frame = $dom<HTMLDivElement>("page");
   $dom<HTMLInputElement>('theme')!.addEventListener("change", (e) => {
     const className = frame!.className;
@@ -30,6 +29,41 @@ function registerTheme() {
   });
 }
 
+export function setBg() {
+  const upload = $dom<HTMLInputElement>('upload')
+  upload!.addEventListener('change', (e: any) => {
+    const value = e.target?.value;
+    if (value) {
+      // 是一张图片
+      const file = e.target?.files[0];
+      // 创建一个新的FileReader对象，用来读取文件信息
+      var reader = new FileReader();
+      // 读取用户上传的图片的路径
+      reader.readAsDataURL(file);
+
+      // 读取完毕之后，将图片的src属性修改成用户上传的图片的本地路径
+      reader.onload = function (ev) {
+        // $('#tipsContent').addClass('hide');
+        console.log('upload success')
+        if (value.toLowerCase().match(/\.(jpe?g|png|gif|webp)$/g)) {
+          // $('#viewVideo').addClass('hide')
+          // $('#viewImage').removeClass('hide').attr('src', reader.target.result);
+          $dom('page')?.setAttribute('style', `background-image: url(${(ev as any).target.result})`);
+          // const className = $dom('page')?.className;
+          // $dom('page')?.setAttribute('class', className + ' ' + 'backImage');
+          if (!$dom('page')?.classList.contains('backImage')) {
+            $dom('page')?.classList.add('backImage');
+          }
+        // } else if (value.toLowerCase().match(/\.(mp4|mov)$/g)) {
+          // $('#viewImage').addClass('hide');
+          // $('#viewVideo').removeClass('hide').attr('src', reader.target.result);
+        }
+      }
+    }
+    // upload!.value = '';
+  });
+}
+
 export function initEditor() {
   timeTheme();
 
@@ -38,7 +72,6 @@ export function initEditor() {
   const fontSize = $dom<HTMLSelectElement>('fontSize');
   const downDom = $dom<HTMLInputElement>('down');
   const title = $dom<HTMLInputElement>('title');
-  const upload = $dom<HTMLInputElement>('upload')
 
   downDom!.addEventListener('click', () => {
     if (!inputBox!.value || !title!.value) {
@@ -77,35 +110,5 @@ export function initEditor() {
     }
   })
 
-  upload!.addEventListener('change', (e: any) => {
-    const value = e.target?.value;
-    if (value) {
-      // 是一张图片
-      const file = e.target?.files[0];
-      // 创建一个新的FileReader对象，用来读取文件信息
-      var reader = new FileReader();
-      // 读取用户上传的图片的路径
-      reader.readAsDataURL(file);
-
-      // 读取完毕之后，将图片的src属性修改成用户上传的图片的本地路径
-      reader.onload = function (ev) {
-        // $('#tipsContent').addClass('hide');
-        console.log('upload success')
-        if (value.toLowerCase().match(/\.(jpe?g|png|gif|webp)$/g)) {
-          // $('#viewVideo').addClass('hide')
-          // $('#viewImage').removeClass('hide').attr('src', reader.target.result);
-          $dom('page')?.setAttribute('style', `background-image: url(${(ev as any).target.result})`);
-          // const className = $dom('page')?.className;
-          // $dom('page')?.setAttribute('class', className + ' ' + 'backImage');
-          if (!$dom('page')?.classList.contains('backImage')) {
-            $dom('page')?.classList.add('backImage');
-          }
-        // } else if (value.toLowerCase().match(/\.(mp4|mov)$/g)) {
-          // $('#viewImage').addClass('hide');
-          // $('#viewVideo').removeClass('hide').attr('src', reader.target.result);
-        }
-      }
-    }
-    // upload!.value = '';
-  });
+  setBg();
 }

@@ -1,5 +1,5 @@
 // 保留字
-export const saveWords = [
+export const savedWords = [
   'abstract',	'arguments',	'boolean',	'break',	'byte',
   'case',	'catch',	'char',	'class',	'const',
   'continue',	'debugger',	'default',	'delete',	'do',

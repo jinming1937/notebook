@@ -11,6 +11,7 @@ let ROOT_ID = -1;
 const list: IContent[] = [];
 
 export function renderContentTree() {
+  console.log('render');
   // 获取数据
   getAllContent<IContent>().then((data: IContent) => {
     if (data) {
@@ -121,7 +122,6 @@ export function initContent () {
       inputTimeFlag = setTimeout(() => {
         sender((e.target as HTMLInputElement).value);
         saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
-          // console.log(data);
           if (data) {
             console.log('save success!');
           } else {
@@ -156,7 +156,6 @@ export function initContent () {
         }
       }
       addContent<{id: number}>(currentFile.name, currentFile.type, currentFile.parent).then((data) => {
-        console.log(data);
         if (data.id) {
           currentFile!.id = data.id;
           renderFileList(current?.children || []);
@@ -187,7 +186,6 @@ export function initContent () {
   });
 
   $dom(IDS.FileList)!.addEventListener('click', (e) => {
-    // console.log(e.target);
     const element = e.target as HTMLElement;
     if ((element as HTMLElement).nodeName === 'S') {
       const index = (element as HTMLElement).getAttribute('index') || '0';
@@ -259,7 +257,6 @@ export function initContent () {
         currentFile = newFile as IContent;
       }
       addContent<{id: number}>(newFile.name, newFile.type as FileType, current.id).then((data) => {
-        console.log(data);
         if (data.id) {
           newFile.id = data.id;
           renderFileList(current?.children || []);
@@ -297,7 +294,6 @@ export function initContent () {
       }
     }
     addContent<{id: number}>(newContent.name, newContent.type as FileType, current?.id || ROOT_ID).then((data) => {
-      console.log(data);
       if (data.id) {
         newContent.id = data.id;
         renderFileList(current?.children || []);

@@ -7,7 +7,7 @@
   <title>Document</title>
 </head>
 <body>
-  <div>
+  <div style="display: none;">
     <form action="/api/nb/register" method="post">
       <input type="text" name="name" id="">
       <input type="text" name="user" id="">
@@ -15,10 +15,31 @@
       <input type="submit" value="提交">
     </form>
   </div>
-  <div id="hiddenHeader" class="selectHeader" style="height: 36px;">
-    <select id="fileContent">
-      <option value="-1">请选择</option>
-    </select>
+  <div class="page light" id="page">
+    <div id="hiddenHeader" class="toolBar">
+      <label for="theme">dark</label>
+      <input type="checkbox" name="theme" id="theme">
+      <input type="input" name="search" id="search">
+      <input placeholder="上传背景" type="file" id="upload" accept=".jpg,.png,.webp"/>
+    </div>
+    <div class="content">
+      <div class="searchResultBox">
+        <ul class="searchResult" id="searchResult"></ul>
+      </div>
+      <div class="preview">
+        <iframe id="frameDom" sandbox="allow-same-origin allow-scripts">浏览器不支持IFrame，无法正确显示内容</iframe>
+      </div>
+    </div>
   </div>
+  <div id="mask" class="mask hidden">
+    <div class="login">
+      <p>为了安全起见，需要输入口令：</p>
+      <p>
+        <input type="password" value="" id="pwd">
+        <input type="button" id="login" value="登录">
+      </p>
+    </div>
+  </div>
+  <iframe class="zixian" sandbox="allow-same-origin allow-scripts" src="http://localhost:9999/static/katun/index.html" ></iframe>
 </body>
 </html>

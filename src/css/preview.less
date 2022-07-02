@@ -26,10 +26,24 @@ p {
 
   .codeNo {
     text-align: right;
+    vertical-align: top;
     color: #fff;
     background-color: #f0f0f0;
     padding: 0 3px;
     border-right: 1px solid #c2c2c2;
+  }
+
+  tbody {
+    &:first-child(tr) {
+      td.codeNo{
+        border-top-left-radius: 4px;
+      }
+    }
+    &:last-child(tr) {
+      td.codeNo {
+        border-bottom-left-radius: 4px;
+      }
+    }
   }
 
   .codeText {
@@ -82,11 +96,11 @@ img {
   }
 
   .code {
-    background: #343434;
+    background-color: rgba(52, 52, 52, 0.3);
 
     .codeNo {
       color: #fff;
-      background-color: #afafaf;
+      background-color: rgba(52, 52, 52, 0.3);
     }
 
     .codeText {
@@ -103,7 +117,7 @@ img {
   }
 
   .code {
-    background: rgba(221, 221, 221, 0.6);
+    background: rgba(221, 221, 221, 0.3);
 
     .codeNo {
       color: #333;
