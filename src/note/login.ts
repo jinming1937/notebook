@@ -41,7 +41,6 @@ export const initLogin = (cb?: () => void) => {
         $dom('mask')!.className = 'mask';
         $dom('pwd')?.focus();
         stop();
-        clearFile();
         sender('');
         isLogin = false;
         cb && cb();

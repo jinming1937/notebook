@@ -30,7 +30,7 @@ export function initContent () {
 
   renderContentTree();
 
-  $dom(IDS.TreeContent)!.addEventListener('click', (e) => {
+  function treeContentHandler(e: MouseEvent | TouchEvent) {
     const element = e.target as HTMLElement;
     if (element.className.match('triangle') !== null) {
       const id = element.parentElement?.getAttribute('key') || '';
@@ -80,7 +80,15 @@ export function initContent () {
       }
       (keyElement)!.className = 'active';
     }
+  }
+
+  $dom(IDS.TreeContent)!.addEventListener('click', (e) => {
+    treeContentHandler(e);
   });
+
+  // $dom(IDS.TreeContent)!.addEventListener('touchstart', (e) => {
+  //   treeContentHandler(e);
+  // });
 
   let inputTimeFlag: any = 0;
   $dom(IDS.InputBox)!.addEventListener('input', (e) => {
@@ -131,6 +139,42 @@ export function initContent () {
       }, 500);
     }
   });
+
+  $dom(IDS.InputBox)!.addEventListener('paste', (e) => {
+    if (e.clipboardData) {
+      const {types, items, files} = e.clipboardData;
+      console.log(types, items, files);
+      if (types.length > 0 && items.length > 0 && files.length > 0) {
+        const file = files[0];
+        if (['image/png'].indexOf(file.type) !== -1) {
+          // 是一张图片
+          // 创建一个新的FileReader对象，用来读取文件信息
+          var reader = new FileReader();
+          // 读取用户上传的图片的路径
+          reader.readAsDataURL(file);
+
+          // 读取完毕之后，将图片的src属性修改成用户上传的图片的本地路径
+          reader.onload = function (ev) {
+            // $('#tipsContent').addClass('hide');
+            console.log('upload success')
+            if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
+              // $('#viewVideo').addClass('hide')
+              // $('#viewImage').removeClass('hide').attr('src', reader.target.result);
+              $dom('page')?.setAttribute('style', `background-image: url(${(ev as any).target.result})`);
+              // const className = $dom('page')?.className;
+              // $dom('page')?.setAttribute('class', className + ' ' + 'backImage');
+              if (!$dom('page')?.classList.contains('backImage')) {
+                $dom('page')?.classList.add('backImage');
+              }
+            // } else if (value.toLowerCase().match(/\.(mp4|mov)$/g)) {
+              // $('#viewImage').addClass('hide');
+              // $('#viewVideo').removeClass('hide').attr('src', reader.target.result);
+            }
+          }
+        }
+      }
+    }
+  })
 
   $dom(IDS.Title)!.addEventListener('input', (e) => {
     if (!currentFile) {
