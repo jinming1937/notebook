@@ -1,5 +1,5 @@
 import { FileType, IContent } from "../entity/common";
-import { getAllContent, addContent, removeContent, changeContentTitle } from "../net/content";
+import { getAllContent, addContent, removeContent, changeContentTitle, uploadImg } from "../net/content";
 import { saveFile } from "../net/file";
 import { $dom, debounce, getItemById, IDS, randomNumber, sendToFrame } from "../util";
 import { readFile } from "./doc";
@@ -9,6 +9,14 @@ import { renderContent } from './contentTree';
 
 let ROOT_ID = -1;
 const list: IContent[] = [];
+
+function insterImg(img: string) {
+  const host = 'http://localhost:9960';
+  const path = '/api/soft/static/';
+  const index = $dom<HTMLTextAreaElement>(IDS.InputBox)?.selectionStart;
+  const str = $dom<HTMLTextAreaElement>(IDS.InputBox)!.value
+  $dom<HTMLTextAreaElement>(IDS.InputBox)!.value = str.slice(0, index) + `![图片](${host}${path}${img})` + str.slice(index);
+}
 
 export function renderContentTree() {
   console.log('render');
@@ -92,6 +100,7 @@ export function initContent () {
 
   let inputTimeFlag: any = 0;
   $dom(IDS.InputBox)!.addEventListener('input', (e) => {
+    if ((e as InputEvent).inputType === "insertFromPaste") return;
     if (currentFile === null) {
       currentFile = {
         name: '新建文件',
@@ -140,36 +149,70 @@ export function initContent () {
     }
   });
 
+  $dom('uploadImage')?.addEventListener('change', (e) => {
+    if (e.target) {
+      const files = (e.target as HTMLInputElement).files;
+      if (!files || !currentFile) {
+        return;
+      }
+      const file = files[0];
+      console.log(files[0]);
+      if (['image/png', 'image/jpeg'].indexOf(file.type) !== -1) {
+        // 是一张图片
+        if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
+          const formData = new FormData()
+          formData.append('img', file);
+          uploadImg<{data: string[]}>(formData).then((data) => {
+            if (data && currentFile) {
+              console.log(data);
+              insterImg(data[0]);
+              const id = currentFile.id;
+              saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
+                if (data) {
+                  console.log('save success!');
+                } else {
+                  console.log('save fail!');
+                }
+              });
+            }
+          }).catch((error) => {
+            console.log(error);
+          });
+        }
+      }
+    }
+  });
+
   $dom(IDS.InputBox)!.addEventListener('paste', (e) => {
+    if (!currentFile) {
+      return;
+    }
     if (e.clipboardData) {
       const {types, items, files} = e.clipboardData;
-      console.log(types, items, files);
       if (types.length > 0 && items.length > 0 && files.length > 0) {
         const file = files[0];
+        console.log(files[0]);
         if (['image/png'].indexOf(file.type) !== -1) {
           // 是一张图片
-          // 创建一个新的FileReader对象，用来读取文件信息
-          var reader = new FileReader();
-          // 读取用户上传的图片的路径
-          reader.readAsDataURL(file);
-
-          // 读取完毕之后，将图片的src属性修改成用户上传的图片的本地路径
-          reader.onload = function (ev) {
-            // $('#tipsContent').addClass('hide');
-            console.log('upload success')
-            if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
-              // $('#viewVideo').addClass('hide')
-              // $('#viewImage').removeClass('hide').attr('src', reader.target.result);
-              $dom('page')?.setAttribute('style', `background-image: url(${(ev as any).target.result})`);
-              // const className = $dom('page')?.className;
-              // $dom('page')?.setAttribute('class', className + ' ' + 'backImage');
-              if (!$dom('page')?.classList.contains('backImage')) {
-                $dom('page')?.classList.add('backImage');
+          if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
+            const formData = new FormData()
+            formData.append('img', file);
+            uploadImg<string[]>(formData).then((data) => {
+              if (data && currentFile) {
+                console.log(data);
+                insterImg(data[0]);
+                const id = currentFile.id;
+                saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
+                  if (data) {
+                    console.log('save success!');
+                  } else {
+                    console.log('save fail!');
+                  }
+                });
               }
-            // } else if (value.toLowerCase().match(/\.(mp4|mov)$/g)) {
-              // $('#viewImage').addClass('hide');
-              // $('#viewVideo').removeClass('hide').attr('src', reader.target.result);
-            }
+            }).catch((error) => {
+              console.log(error);
+            });
           }
         }
       }

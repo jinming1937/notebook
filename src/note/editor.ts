@@ -8,7 +8,7 @@ function timeTheme () {
   if ($dom<HTMLInputElement>('upload')!.value) {
     return;
   }
-  if (nowHours > 6 && nowHours < 20) {
+  if (nowHours > 6 && nowHours < 19) {
     frame!.className = className.replace("dark", "light");
     theme!.checked = false;
   } else {

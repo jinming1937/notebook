@@ -25,6 +25,10 @@ export function debounce(callback: () => void, timeFlag: number) {
 export function sendToFrame() {
   //主页面发送消息
   const myFrame = document.getElementById("frameDom");//获取框架
+
+  window.addEventListener('message', function(e) {
+    console.log(e);
+  })
   return (value: string) => {
     (myFrame as HTMLIFrameElement)?.contentWindow?.postMessage(value, location.href);
   }

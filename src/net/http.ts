@@ -19,7 +19,7 @@ function obj2Url(obj: IKeys) {
   return strParams.replace(/^&/, '?');
 }
 
-export function http<T>(url: string, method?: 'GET' | 'POST', params?: IKeys, options?: IKeys) {
+export function http<T>(url: string, method?: 'GET' | 'POST', params?: IKeys, options?: IKeys, headers?: HeadersInit) {
   const config: IConfig = {
     method: method || 'GET',
   }
@@ -30,12 +30,21 @@ export function http<T>(url: string, method?: 'GET' | 'POST', params?: IKeys, op
       config.body = JSON.stringify(params);
     }
   }
+  const body = (config.body || options && options.body);
+  const headersOptions = {
+    ...headers,
+  }
+  if (body && body.constructor.name !== 'FormData' || method === 'GET') {
+    Object.assign(headersOptions, {
+      'Content-Type': 'application/json',
+    })
+  }
   return new Promise((resolve: (d: T) => void, reject: (s: string) => void) => {
     fetch(url, {
       ...config,
+      ...(options || {}),
       headers: {
-        'Content-Type': 'application/json',
-        ...(options || {})
+        ...(headersOptions)
       },
     }).then(res => res.json()).then((data: T) => {
       // 统一处理：失败
@@ -47,10 +56,10 @@ export function http<T>(url: string, method?: 'GET' | 'POST', params?: IKeys, op
   })
 }
 
-export function get<T>(url: string, params?: IKeys, options?: IKeys) {
-  return http<T>(url, 'GET', params, options)
+export function get<T>(url: string, params?: IKeys, options?: IKeys, headers?: HeadersInit) {
+  return http<T>(url, 'GET', params, options, headers)
 }
 
-export function post<T>(url: string, params?: IKeys, options?: IKeys) {
-  return http<T>(url, 'POST', params, options)
+export function post<T>(url: string, params?: IKeys, options?: IKeys, headers?: HeadersInit) {
+  return http<T>(url, 'POST', params, options, headers)
 }

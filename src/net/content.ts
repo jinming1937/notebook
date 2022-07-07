@@ -41,3 +41,14 @@ export function getFileList<T>() {
     return data.data;
   })
 }
+
+export function uploadImg<T>(params: any) {
+  return post<IRes<T>>('/api/upload/img', undefined, {
+    body: params,
+  }, {
+    // 'Content-Type': 'multipart/form-data; charset:utf-8'
+  }).then(data => {
+    console.log(data);
+    return data.data;
+  });
+}
