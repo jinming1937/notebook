@@ -16,7 +16,6 @@ window.onload = (ev) => {
   window.addEventListener('message', function(e) {
     console.log(e);
     if(["http://localhost:8080", "http://localhost:8080/link.html"].indexOf(e.origin) !== -1) {
-      // console.log(e.data); //可以对数据进行处理
       if (typeof e.data === 'string') {
         $dom('frameBox')!.innerHTML = md2HTML(e.data || '');
       }

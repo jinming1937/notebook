@@ -3,10 +3,24 @@
  */
 import { randomNum } from "@/util"
 import { regCodeEnd, regCodeStart, regContent, regCrossbar, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
-import { savedWords } from "@/util/keyWords";
+import { savedWords, controlSaveWord, attributeSaveWord, declareSaveWord } from "@/util/keyWords";
+
+const allMatch = new RegExp('\\b((' + controlSaveWord.join('|') + ')|(' + declareSaveWord.join('|') + ')|(' + attributeSaveWord.join('|') + '))\\b', 'ig');
 
 function superCode(content: string) {
-  return content;
+  const text = content
+    .replace(allMatch, ($1, $2, $3) => {
+      if ($1) return `<span class="pink">${$1}</span>`
+      if ($2) return `<span class="pink">${$2}</span>`
+      if ($3) return `<span class="pink">${$3}</span>`
+      return '';
+    })
+  const leftSpace = text.match(/^\s+/);
+  let space = '';
+  if (leftSpace) {
+    space = new Array(leftSpace[0].length + 1).join('<span class="space"> </span>');
+  }
+  return space + text.trim();
 }
 
 function format(content: string) {

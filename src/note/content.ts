@@ -100,6 +100,7 @@ export function initContent () {
 
   let inputTimeFlag: any = 0;
   $dom(IDS.InputBox)!.addEventListener('input', (e) => {
+    console.log(e);
     if ((e as InputEvent).inputType === "insertFromPaste") return;
     if (currentFile === null) {
       currentFile = {
@@ -156,7 +157,6 @@ export function initContent () {
         return;
       }
       const file = files[0];
-      console.log(files[0]);
       if (['image/png', 'image/jpeg'].indexOf(file.type) !== -1) {
         // 是一张图片
         if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
@@ -164,7 +164,6 @@ export function initContent () {
           formData.append('img', file);
           uploadImg<{data: string[]}>(formData).then((data) => {
             if (data && currentFile) {
-              console.log(data);
               insterImg(data[0]);
               const id = currentFile.id;
               saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
@@ -191,7 +190,6 @@ export function initContent () {
       const {types, items, files} = e.clipboardData;
       if (types.length > 0 && items.length > 0 && files.length > 0) {
         const file = files[0];
-        console.log(files[0]);
         if (['image/png'].indexOf(file.type) !== -1) {
           // 是一张图片
           if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
@@ -199,7 +197,6 @@ export function initContent () {
             formData.append('img', file);
             uploadImg<string[]>(formData).then((data) => {
               if (data && currentFile) {
-                console.log(data);
                 insterImg(data[0]);
                 const id = currentFile.id;
                 saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
@@ -215,6 +212,8 @@ export function initContent () {
             });
           }
         }
+      } else if (types.indexOf('text/plain') !== -1) {
+        sender((e.target as HTMLInputElement).value);
       }
     }
   })
