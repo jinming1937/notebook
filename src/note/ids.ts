@@ -16,6 +16,7 @@ export const IDS = {
    * 移动条
    */
   TargetBar: 'targetBar',
+  ActiveGap: 'activeGap',
   /**
    * 文件盒子
    */

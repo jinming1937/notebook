@@ -1,7 +1,8 @@
 import { $dom, sendToFrame } from './util';
 import { initLogin } from './note/login';
 import { getFileById, searchFileByKey } from './net/file';
-import { registerTheme, setBg } from './note/editor';
+import { registerTheme } from '@/component/theme';
+import { registerBg } from '@/component/background';
 
 window.addEventListener('load', () => {
   console.log('load ready');
@@ -9,11 +10,17 @@ window.addEventListener('load', () => {
 
   $dom<HTMLIFrameElement>('frameDom')!.src = './preview.html';
 
-  // 安全管理
-  initLogin(() => {});
+  const tool = {
+    page: $dom<HTMLDivElement>('page')!,
+    frame: $dom<HTMLDivElement>("page")!,
+    theme: $dom<HTMLInputElement>("theme")!,
+    bg: $dom<HTMLInputElement>('upload')!,
+  }
 
-  registerTheme();
-  setBg();
+  // 安全管理
+  initLogin();
+  registerTheme(tool.frame, tool.theme);
+  registerBg(tool.bg, tool.page);
 
   $dom('search')?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {

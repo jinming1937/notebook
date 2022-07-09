@@ -1,7 +1,5 @@
 import { heatBit, login, logout } from "@/net/safe";
 import { $dom, sendToFrame } from "@/util"
-import { renderContentTree } from "./content";
-import { clearFile } from "./fileList";
 
 function animate(callback: () => void, timeGap: number, immediately: boolean) {
   let nowTime = Date.now();
@@ -31,24 +29,23 @@ function animate(callback: () => void, timeGap: number, immediately: boolean) {
   return [start, stop];
 }
 
-export const initLogin = (cb?: () => void) => {
+export const initLogin = (loginCb?: () => void, logoutCb?: () => void) => {
   let isLogin = false;
   const sender = sendToFrame()
   const [start, stop] = animate(() => {
     heatBit().then((data) => {
-      console.log(data);
       if (data !== 0) { // 登录态过期
         $dom('mask')!.className = 'mask';
         $dom('pwd')?.focus();
         stop();
         sender('');
         isLogin = false;
-        cb && cb();
+        loginCb && loginCb();
       } else {
         if (!isLogin){ // 登录态正常，但是页面未初始化
           isLogin = true;
           $dom('mask')!.className = 'mask hidden';
-          cb && cb();
+          loginCb && loginCb();
         }
       }
     });
@@ -63,7 +60,7 @@ export const initLogin = (cb?: () => void) => {
           $dom<HTMLInputElement>('pwd')!.value = '';
           isLogin = true;
           start()
-          renderContentTree();
+          loginCb && loginCb();
         } else {
           alert('password was wrong!!');
         }
@@ -80,7 +77,7 @@ export const initLogin = (cb?: () => void) => {
   $dom('logout')?.addEventListener('click', (e) => {
     logout().then(() => {
       stop();
-      clearFile();
+      logoutCb && logoutCb();
       sender('');
       $dom('mask')!.className = 'mask';
       $dom('pwd')?.focus();

@@ -1,16 +1,31 @@
 import { FileType, IContent } from "../entity/common";
 import { getAllContent, addContent, removeContent, changeContentTitle, uploadImg } from "../net/content";
 import { saveFile } from "../net/file";
-import { $dom, debounce, getItemById, IDS, randomNumber, sendToFrame } from "../util";
+import { $dom, debounce, randomNumber, sendToFrame } from "../util";
 import { readFile } from "./doc";
 import { clearFile, renderFileList } from "./fileList";
 import { setLocalContent, removeLocalContent } from './local';
 import { renderContent } from './contentTree';
+import { IDS } from './ids';
 
 let ROOT_ID = -1;
 const list: IContent[] = [];
 
-function insterImg(img: string) {
+function getItemById(id: number, list: IContent[]): IContent | null {
+  let target: IContent | null = null;
+  list.forEach((item) => {
+    if (target !== null) return;
+    if (id === item.id) {
+      target = item;
+    } else if (item.children && item.children.length > 0) {
+      target = getItemById(id, item.children);
+    }
+  });
+
+  return target;
+}
+
+function insertImg(img: string) {
   const host = 'http://localhost:9960';
   const path = '/api/soft/static/';
   const index = $dom<HTMLTextAreaElement>(IDS.InputBox)?.selectionStart;
@@ -164,7 +179,7 @@ export function initContent () {
           formData.append('img', file);
           uploadImg<{data: string[]}>(formData).then((data) => {
             if (data && currentFile) {
-              insterImg(data[0]);
+              insertImg(data[0]);
               const id = currentFile.id;
               saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
                 if (data) {
@@ -197,7 +212,7 @@ export function initContent () {
             formData.append('img', file);
             uploadImg<string[]>(formData).then((data) => {
               if (data && currentFile) {
-                insterImg(data[0]);
+                insertImg(data[0]);
                 const id = currentFile.id;
                 saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
                   if (data) {

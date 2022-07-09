@@ -4,30 +4,25 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Notebook</title>
 </head>
 <body>
-  <div style="display: none;">
-    <form action="/api/nb/register" method="post">
-      <input type="text" name="name" id="">
-      <input type="text" name="user" id="">
-      <input type="password" name="pwd" id="">
-      <input type="submit" value="提交">
-    </form>
-  </div>
-  <div class="page light" id="page">
-    <div id="hiddenHeader" class="toolBar">
-      <label for="theme">dark</label>
-      <input type="checkbox" name="theme" id="theme">
-      <input type="input" name="search" id="search">
-      <input placeholder="上传背景" type="file" id="upload" accept=".jpg,.png,.webp"/>
-    </div>
-    <div class="content">
-      <div class="searchResultBox">
-        <ul class="searchResult" id="searchResult"></ul>
+  <div class="page dark" id="page">
+    <div class="box">
+      <div id="hiddenHeader" class="toolBar">
+        <input type="button" value="锁定" id="logout">
+        <label for="theme">dark</label>
+        <input type="checkbox" id="theme">
+        <input type="input" id="search">
+        <input placeholder="上传背景" type="file" id="upload" accept=".jpg,.png,.webp"/>
       </div>
-      <div class="preview">
-        <iframe id="frameDom" sandbox="allow-same-origin allow-scripts">浏览器不支持IFrame，无法正确显示内容</iframe>
+      <div class="content">
+        <div class="searchResultBox">
+          <ul class="searchResult" id="searchResult"></ul>
+        </div>
+        <div class="preview">
+          <iframe id="frameDom" sandbox="allow-same-origin allow-scripts">浏览器不支持IFrame，无法正确显示内容</iframe>
+        </div>
       </div>
     </div>
   </div>
@@ -40,6 +35,6 @@
       </p>
     </div>
   </div>
-  <iframe class="zixian" sandbox="allow-same-origin allow-scripts" src="http://localhost:9999/static/katun/index.html" ></iframe>
+  <!-- <iframe class="zixian" sandbox="allow-same-origin allow-scripts" src="http://localhost:9999/static/katun/index.html" ></iframe> -->
 </body>
 </html>

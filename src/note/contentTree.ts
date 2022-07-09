@@ -28,5 +28,5 @@ function createContentTree (list: IContent[]) {
 
 export function renderContent(list: IContent[]) {
   const html_ = createContentTree(list);
-  $dom('treeContent')!.innerHTML = html_;
+  $dom<HTMLDivElement>('treeContent')!.innerHTML = html_;
 }

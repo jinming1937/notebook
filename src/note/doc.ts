@@ -1,6 +1,7 @@
 import { IContent } from "@/entity/common";
 import { getFile } from "@/net/file";
-import { $dom, IDS, sendToFrame } from "@/util";
+import { $dom, sendToFrame } from "@/util";
+import { IDS } from './ids';
 
 const sender = sendToFrame();
 export function readFile(currentFile: IContent) {

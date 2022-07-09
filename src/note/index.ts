@@ -15,5 +15,7 @@ export function initNote() {
   initLogin(() => {
     clearFile();
     renderContentTree();
+  }, () => {
+    clearFile();
   });
 }
