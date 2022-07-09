@@ -1,14 +1,37 @@
 import { FileType, IContent } from "../entity/common";
-import { getAllContent, addContent, removeContent, changeContentTitle } from "../net/content";
+import { getAllContent, addContent, removeContent, changeContentTitle, uploadImg } from "../net/content";
 import { saveFile } from "../net/file";
-import { $dom, debounce, getItemById, IDS, randomNumber, sendToFrame } from "../util";
+import { $dom, debounce, randomNumber, sendToFrame } from "../util";
 import { readFile } from "./doc";
 import { clearFile, renderFileList } from "./fileList";
 import { setLocalContent, removeLocalContent } from './local';
 import { renderContent } from './contentTree';
+import { IDS } from './ids';
 
 let ROOT_ID = -1;
 const list: IContent[] = [];
+
+function getItemById(id: number, list: IContent[]): IContent | null {
+  let target: IContent | null = null;
+  list.forEach((item) => {
+    if (target !== null) return;
+    if (id === item.id) {
+      target = item;
+    } else if (item.children && item.children.length > 0) {
+      target = getItemById(id, item.children);
+    }
+  });
+
+  return target;
+}
+
+function insertImg(img: string) {
+  const host = 'http://localhost:9960';
+  const path = '/api/soft/static/';
+  const index = $dom<HTMLTextAreaElement>(IDS.InputBox)?.selectionStart;
+  const str = $dom<HTMLTextAreaElement>(IDS.InputBox)!.value
+  $dom<HTMLTextAreaElement>(IDS.InputBox)!.value = str.slice(0, index) + `![图片](${host}${path}${img})` + str.slice(index);
+}
 
 export function renderContentTree() {
   console.log('render');
@@ -30,7 +53,7 @@ export function initContent () {
 
   renderContentTree();
 
-  $dom(IDS.TreeContent)!.addEventListener('click', (e) => {
+  function treeContentHandler(e: MouseEvent | TouchEvent) {
     const element = e.target as HTMLElement;
     if (element.className.match('triangle') !== null) {
       const id = element.parentElement?.getAttribute('key') || '';
@@ -80,10 +103,20 @@ export function initContent () {
       }
       (keyElement)!.className = 'active';
     }
+  }
+
+  $dom(IDS.TreeContent)!.addEventListener('click', (e) => {
+    treeContentHandler(e);
   });
+
+  // $dom(IDS.TreeContent)!.addEventListener('touchstart', (e) => {
+  //   treeContentHandler(e);
+  // });
 
   let inputTimeFlag: any = 0;
   $dom(IDS.InputBox)!.addEventListener('input', (e) => {
+    console.log(e);
+    if ((e as InputEvent).inputType === "insertFromPaste") return;
     if (currentFile === null) {
       currentFile = {
         name: '新建文件',
@@ -131,6 +164,74 @@ export function initContent () {
       }, 500);
     }
   });
+
+  $dom('uploadImage')?.addEventListener('change', (e) => {
+    if (e.target) {
+      const files = (e.target as HTMLInputElement).files;
+      if (!files || !currentFile) {
+        return;
+      }
+      const file = files[0];
+      if (['image/png', 'image/jpeg'].indexOf(file.type) !== -1) {
+        // 是一张图片
+        if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
+          const formData = new FormData()
+          formData.append('img', file);
+          uploadImg<{data: string[]}>(formData).then((data) => {
+            if (data && currentFile) {
+              insertImg(data[0]);
+              const id = currentFile.id;
+              saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
+                if (data) {
+                  console.log('save success!');
+                } else {
+                  console.log('save fail!');
+                }
+              });
+            }
+          }).catch((error) => {
+            console.log(error);
+          });
+        }
+      }
+    }
+  });
+
+  $dom(IDS.InputBox)!.addEventListener('paste', (e) => {
+    if (!currentFile) {
+      return;
+    }
+    if (e.clipboardData) {
+      const {types, items, files} = e.clipboardData;
+      if (types.length > 0 && items.length > 0 && files.length > 0) {
+        const file = files[0];
+        if (['image/png'].indexOf(file.type) !== -1) {
+          // 是一张图片
+          if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
+            const formData = new FormData()
+            formData.append('img', file);
+            uploadImg<string[]>(formData).then((data) => {
+              if (data && currentFile) {
+                insertImg(data[0]);
+                const id = currentFile.id;
+                saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
+                  if (data) {
+                    console.log('save success!');
+                  } else {
+                    console.log('save fail!');
+                  }
+                });
+              }
+            }).catch((error) => {
+              console.log(error);
+            });
+          }
+        }
+      } else if (types.indexOf('text/plain') !== -1) {
+        sender((e.target as HTMLInputElement).value);
+      }
+    }
+  })
 
   $dom(IDS.Title)!.addEventListener('input', (e) => {
     if (!currentFile) {

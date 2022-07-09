@@ -14,7 +14,7 @@ export const TagMap = {
   '**': 'strong',
   '~~': 'del',
   '++': 'u',
-  '==': 'span',
+  '==': 'b',
 }
 // 匹配行内链接
 export const regLink = /(?<!\!)[\[](.+?)[\]][\(](.+?)[\)]/

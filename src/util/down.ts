@@ -1,4 +1,4 @@
-export function down(fileName: string, data: any) {
+export function download(fileName: string, data: any) {
   const urlObject = URL;
   const export_blob = new Blob([data]);
   const save_link = document.createElement('a');

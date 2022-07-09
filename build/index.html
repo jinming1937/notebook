@@ -18,6 +18,7 @@
           </div>
           <ul class="treeContentBox" id="treeContent"></ul>
         </div>
+        <div class="activeGap hidden" id="activeGap"></div>
         <div class="activeBarMask" id="activeBarMask">
           <div class="targetBar" id="targetBar"></div>
         </div>
@@ -45,21 +46,9 @@
             <option value="16px">16px</option>
           </select>
           |
-          <label>
-            <a class="linkBtn">h1</a>
-            <a class="linkBtn">h2</a>
-            <a class="linkBtn">h3</a>
-            <a class="linkBtn">h4</a>
-            <a class="linkBtn">h5</a>
-            <a class="linkBtn">h6</a>
-            <a class="linkBtn">Link</a>
-            <a class="linkBtn">列表</a>
-            <a class="linkBtn">删除</a>
-            <a class="linkBtn">高亮</a>
-            <a class="linkBtn">加粗</a>
-            <a class="linkBtn">下划线</a>
-          </label>
-          <input placeholder="上传背景" type="file" id="upload" accept=".jpg,.png,.webp"/>
+          <label class="uploadBtn" for="uploadImage">上传图片<input style="display: none;" placeholder="上传图片" type="file" id="uploadImage" accept=".jpg,.png,.webp"/></label>
+          |
+          <label class="uploadBtn" for="upload">设置背景<input style="display: none;" placeholder="上传背景" type="file" id="upload" accept=".jpg,.png,.webp"/></label>
         </div>
         <div class="editorContent">
           <div class="editorInput">
@@ -81,6 +70,6 @@
       </p>
     </div>
   </div>
-  <iframe class="zixian" sandbox="allow-same-origin allow-scripts" src="http://localhost:9999/static/katun/index.html" ></iframe>
+  <!-- <iframe class="zixian" sandbox="allow-same-origin allow-scripts" src="http://localhost:9999/static/katun/index.html" ></iframe> -->
 </body>
 </html>

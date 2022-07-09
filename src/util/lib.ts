@@ -1,19 +1,3 @@
-import { IContent } from "@/entity/common";
-
-export function getItemById(id: number, list: IContent[]): IContent | null {
-  let target: IContent | null = null;
-  list.forEach((item) => {
-    if (target !== null) return;
-    if (id === item.id) {
-      target = item;
-    } else if (item.children && item.children.length > 0) {
-      target = getItemById(id, item.children);
-    }
-  });
-
-  return target;
-}
-
 let flag: any = 0;
 export function debounce(callback: () => void, timeFlag: number) {
   clearTimeout(flag);
@@ -25,6 +9,10 @@ export function debounce(callback: () => void, timeFlag: number) {
 export function sendToFrame() {
   //主页面发送消息
   const myFrame = document.getElementById("frameDom");//获取框架
+
+  window.addEventListener('message', function(e) {
+    console.log('收到子页面消息：', e.data.msg);
+  })
   return (value: string) => {
     (myFrame as HTMLIFrameElement)?.contentWindow?.postMessage(value, location.href);
   }

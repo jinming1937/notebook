@@ -1,5 +1,6 @@
 import { IContent } from "@/entity/common";
-import { $dom, IDS } from "@/util";
+import { $dom } from "@/util";
+import { IDS } from './ids';
 
 export function renderFileList(list: IContent[]) {
   let html = ''
@@ -15,7 +16,7 @@ export function renderFileList(list: IContent[]) {
     }
     html += `<li key="${content.id}" class="${classList.join(' ').trim()}" title="${content.name}">${content.name}${suffix}<s index="${index}">删</s></li>`
   });
-  $dom('fileList')!.innerHTML = html;
+  $dom<HTMLDivElement>(IDS.FileList)!.innerHTML = html;
 }
 
 export function clearFile() {

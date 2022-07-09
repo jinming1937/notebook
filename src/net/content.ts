@@ -30,14 +30,20 @@ export function changeContentTitle(name: string, id: number) {
 
 export function getAllContent<T>() {
   return get<IRes<T>>('/api/nb/get_content_tree').then((data) => {
-    console.log('目录数据', data.data);
     return data.data;
   })
 }
 
 export function getFileList<T>() {
   return get<IRes<T>>('/api/nb/get_content_list').then((data) => {
-    console.log('目录数据', data.data);
     return data.data;
   })
+}
+
+export function uploadImg<T>(params: any) {
+  return post<IRes<T>>('/api/upload/img', undefined, {
+    body: params,
+  }).then(data => {
+    return data.data;
+  });
 }
