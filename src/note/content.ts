@@ -6,7 +6,6 @@ import { readFile } from "./doc";
 import { clearFile, renderFileList } from "./fileList";
 import { setLocalContent, removeLocalContent } from './local';
 import { renderContent } from './contentTree';
-import { IDS } from './ids';
 
 let ROOT_ID = -1;
 const list: IContent[] = [];
@@ -25,12 +24,40 @@ function getItemById(id: number, list: IContent[]): IContent | null {
   return target;
 }
 
+function uploadImgHandler(files: FileList, currentFile: IContent) {
+  const file = files[0];
+  if (['image/png', 'image/jpeg'].indexOf(file.type) !== -1) {
+    // 是一张图片
+    if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
+      const formData = new FormData()
+      formData.append('img', file);
+      uploadImg<{data: string[]}>(formData).then((data) => {
+        if (data && currentFile) {
+          const value = insertImg(data[0]);
+          const id = currentFile.id;
+          saveFile(id, value).then((data) => {
+            if (data) {
+              console.log('save success!');
+            } else {
+              console.log('save fail!');
+            }
+          });
+        }
+      }).catch((error) => {
+        console.log(error);
+      });
+    }
+  }
+}
+
 function insertImg(img: string) {
   const host = 'http://localhost:9960';
   const path = '/api/soft/static/';
-  const index = $dom<HTMLTextAreaElement>(IDS.InputBox)?.selectionStart;
-  const str = $dom<HTMLTextAreaElement>(IDS.InputBox)!.value
-  $dom<HTMLTextAreaElement>(IDS.InputBox)!.value = str.slice(0, index) + `![图片](${host}${path}${img})` + str.slice(index);
+  const index = $dom<HTMLTextAreaElement>('inputBox')?.selectionStart;
+  const str = $dom<HTMLTextAreaElement>('inputBox')!.value
+  const value = str.slice(0, index) + `![图片](${host}${path}${img})` + str.slice(index);
+  $dom<HTMLTextAreaElement>('inputBox')!.value = value;
+  return value;
 }
 
 export function renderContentTree() {
@@ -49,9 +76,18 @@ export function renderContentTree() {
 export function initContent () {
   let current: IContent | null = null;
   let currentFile: IContent | null = null;
+  let moveItem: IContent | null = null;
+  const $ContentDom = {
+    treeContent: $dom('treeContent')!, // 树区域
+    fileList: $dom('fileList')!,
+    inputBox: $dom<HTMLTextAreaElement>('inputBox')!,
+    uploadImage: $dom<HTMLInputElement>('uploadImage')!,
+    title: $dom<HTMLInputElement>('title')!,
+    addFile: $dom<HTMLInputElement>('addFile')!,
+    addContent: $dom<HTMLInputElement>('addContent')!
+  }
   const sender = sendToFrame()
-
-  renderContentTree();
+  renderContentTree()
 
   function treeContentHandler(e: MouseEvent | TouchEvent) {
     const element = e.target as HTMLElement;
@@ -71,7 +107,8 @@ export function initContent () {
       }
       return;
     }
-    $dom(IDS.TreeContent)!.querySelectorAll('[key]').forEach((target) => {
+    $ContentDom.treeContent.querySelectorAll('[key]').forEach((target) => {
+      // 清除dom && 清除 list 对象树上的active
       target.className = '';
       const key = target.getAttribute('key') || '';
       const cur = getItemById(parseInt(key), list);
@@ -79,7 +116,8 @@ export function initContent () {
         cur.active = false;
       }
     });
-    $dom(IDS.FileList)!.querySelectorAll('[key]').forEach((target) => {
+    $ContentDom.fileList.querySelectorAll('[key]').forEach((target) => {
+      // 清除 file list dom
       target.className = '';
     });
     clearFile();
@@ -92,6 +130,7 @@ export function initContent () {
       currentFile.editing = false;
       currentFile = null;
     }
+    // 处理点击元素
     const keyElement = element.getAttribute('key') ? element : element.parentElement;
     if (keyElement?.getAttribute('key')) {
       const id = (keyElement)!.getAttribute('key') || '';
@@ -104,18 +143,36 @@ export function initContent () {
       (keyElement)!.className = 'active';
     }
   }
+  $ContentDom.fileList.addEventListener('dragstart', (e: DragEvent) => {
+    const key = (e.target as HTMLElement).getAttribute('key');
+    moveItem = null;
+    if (e.dataTransfer && key) {
+      moveItem = getItemById(Number(key), list);
+      e.dataTransfer.setData("Text", key);
+    }
+  });
+  $ContentDom.treeContent.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  });
+  $ContentDom.treeContent.addEventListener('drop', (e) => {
+    e.preventDefault();
+    console.log(e);
+    const parentKey = (e.target as HTMLElement).getAttribute('key');
+    if (e.dataTransfer && parentKey) {
+      const data = e.dataTransfer.getData("Text");
+      const moveElement = document.querySelector(`[key="${data}"]`);
+      console.log(moveItem);
+      if (moveItem && moveItem.type === 'content' && moveElement) {
+        (e.target as HTMLElement).appendChild(moveElement);
+      }
 
-  $dom(IDS.TreeContent)!.addEventListener('click', (e) => {
+    }
+  });
+  $ContentDom.treeContent.addEventListener('click', (e) => {
     treeContentHandler(e);
   });
-
-  // $dom(IDS.TreeContent)!.addEventListener('touchstart', (e) => {
-  //   treeContentHandler(e);
-  // });
-
   let inputTimeFlag: any = 0;
-  $dom(IDS.InputBox)!.addEventListener('input', (e) => {
-    console.log(e);
+  $ContentDom.inputBox.addEventListener('input', (e) => {
     if ((e as InputEvent).inputType === "insertFromPaste") return;
     if (currentFile === null) {
       currentFile = {
@@ -149,7 +206,7 @@ export function initContent () {
         }
       });
     } else {
-      $dom<HTMLInputElement>(IDS.Title)!.value = currentFile.name;
+      $ContentDom.title.value = currentFile.name;
       const id = currentFile.id;
       clearTimeout(inputTimeFlag);
       inputTimeFlag = setTimeout(() => {
@@ -164,76 +221,29 @@ export function initContent () {
       }, 500);
     }
   });
-
-  $dom('uploadImage')?.addEventListener('change', (e) => {
+  $ContentDom.uploadImage.addEventListener('change', (e) => {
     if (e.target) {
       const files = (e.target as HTMLInputElement).files;
       if (!files || !currentFile) {
         return;
       }
-      const file = files[0];
-      if (['image/png', 'image/jpeg'].indexOf(file.type) !== -1) {
-        // 是一张图片
-        if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
-          const formData = new FormData()
-          formData.append('img', file);
-          uploadImg<{data: string[]}>(formData).then((data) => {
-            if (data && currentFile) {
-              insertImg(data[0]);
-              const id = currentFile.id;
-              saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
-                if (data) {
-                  console.log('save success!');
-                } else {
-                  console.log('save fail!');
-                }
-              });
-            }
-          }).catch((error) => {
-            console.log(error);
-          });
-        }
-      }
+      uploadImgHandler(files, currentFile);
     }
   });
-
-  $dom(IDS.InputBox)!.addEventListener('paste', (e) => {
+  $ContentDom.inputBox.addEventListener('paste', (e) => {
     if (!currentFile) {
       return;
     }
     if (e.clipboardData) {
       const {types, items, files} = e.clipboardData;
       if (types.length > 0 && items.length > 0 && files.length > 0) {
-        const file = files[0];
-        if (['image/png'].indexOf(file.type) !== -1) {
-          // 是一张图片
-          if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
-            const formData = new FormData()
-            formData.append('img', file);
-            uploadImg<string[]>(formData).then((data) => {
-              if (data && currentFile) {
-                insertImg(data[0]);
-                const id = currentFile.id;
-                saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
-                  if (data) {
-                    console.log('save success!');
-                  } else {
-                    console.log('save fail!');
-                  }
-                });
-              }
-            }).catch((error) => {
-              console.log(error);
-            });
-          }
-        }
+        uploadImgHandler(files, currentFile);
       } else if (types.indexOf('text/plain') !== -1) {
         sender((e.target as HTMLInputElement).value);
       }
     }
   })
-
-  $dom(IDS.Title)!.addEventListener('input', (e) => {
+  $ContentDom.title.addEventListener('input', (e) => {
     if (!currentFile) {
       currentFile = {
         name: '新建文件',
@@ -285,8 +295,7 @@ export function initContent () {
       }, 500)
     }
   });
-
-  $dom(IDS.FileList)!.addEventListener('click', (e) => {
+  $ContentDom.fileList.addEventListener('click', (e) => {
     const element = e.target as HTMLElement;
     if ((element as HTMLElement).nodeName === 'S') {
       const index = (element as HTMLElement).getAttribute('index') || '0';
@@ -301,7 +310,7 @@ export function initContent () {
         if (current) current = parentNode;
         if (currentFile) {
           currentFile = null;
-          $dom<HTMLInputElement>(IDS.Title)!.value = '';
+          $ContentDom.title.value = '';
         }
         parentNode.children.splice(parseInt(index), 1);
 
@@ -316,8 +325,11 @@ export function initContent () {
         return;
       }
     }
-    $dom(IDS.FileList)!.querySelectorAll('[key]').forEach((target) => {
+    $ContentDom.fileList.querySelectorAll('[key]').forEach((target) => {
       target.className = target.className?.replace('active', '').trim();
+      if ((target as HTMLElement).draggable) {
+        (target as HTMLElement).draggable = false;
+      }
     });
     if (currentFile) {
       currentFile.editing = false;
@@ -328,20 +340,22 @@ export function initContent () {
       if (item) {
         currentFile = item;
         currentFile.editing = true;
-        renderFileList(current?.children || []);
+        // renderFileList(current?.children || []);
         readFile(currentFile);
       }
-      element.className = 'active';
+      const classList = [];
+      if (item?.type === 'file') {
+        classList.push('file');
+      }
+      if (item?.editing) {
+        classList.push('active');
+      }
+      element.className = classList.join(' ');
+      element.draggable = true;
     }
   });
-
-  $dom(IDS.AddFile)!.addEventListener('click', (e) => {
-    const newFile = {
-      name: '新建文件',
-      id: randomNumber(),
-      type: 'file',
-      editing: true,
-    };
+  $ContentDom.addFile.addEventListener('click', (e) => {
+    const newFile = {name: '新建文件', id: randomNumber(), type: 'file', editing: true};
     if (current) {
       (newFile as IContent).parent = current.id;
       if (current.children) {
@@ -361,7 +375,7 @@ export function initContent () {
         if (data.id) {
           newFile.id = data.id;
           renderFileList(current?.children || []);
-          $dom<HTMLInputElement>(IDS.Title)!.value = newFile.name;
+          $ContentDom.title.value = newFile.name;
         } else {
           console.log('error', data);
         }
@@ -370,12 +384,8 @@ export function initContent () {
       alert('error !!! not found root!!!');
     }
   });
-  $dom(IDS.AddContent)!.addEventListener('click', (e) => {
-    const newContent = {
-      name: '新建目录',
-      id: randomNumber(),
-      type: "content"
-    };
+  $ContentDom.addContent.addEventListener('click', (e) => {
+    const newContent = {name: '新建目录', id: randomNumber(), type: "content"};
     if (current) {
       (newContent as IContent).parent = current.id;
       if (current.children) {

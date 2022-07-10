@@ -14,7 +14,7 @@ window.onload = (ev) => {
   console.log('frame ready');
   //子页面接收消息，并且做出回应
   window.addEventListener('message', function(e) {
-    console.log('receive parent msg', e.data);
+    // console.log('receive parent msg', e.data);
     if(["http://localhost:8080", "http://localhost:8080/link.html"].indexOf(e.origin) !== -1) {
       if (typeof e.data === 'string') {
         $dom('frameBox')!.innerHTML = md2HTML(e.data || '');
