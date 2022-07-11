@@ -11,10 +11,11 @@
     <div class="box">
       <div id="hiddenHeader" class="toolBar">
         <input type="button" value="锁定" id="logout">
-        <label for="theme">dark</label>
-        <input type="checkbox" id="theme">
-        <input type="input" id="search">
-        <label class="uploadBtn" for="upload">上传背景<input type="file" style="display: none;" id="upload" accept=".jpg,.png,.webp"/></label>
+        <label for="theme" class="button">dark<input type="checkbox" id="theme"></label>
+        <div class="fileTitle">
+          <input tabindex="0" type="text" value="" id="search" placeholder="请输入..." maxlength="30">
+        </div>
+        <label class="button" for="upload">上传背景<input type="file" style="display: none;" id="upload" accept=".jpg,.png,.webp"/></label>
       </div>
       <div class="content">
         <div class="searchResultBox">

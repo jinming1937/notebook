@@ -24,7 +24,7 @@ function getItemById(id: number, list: IContent[]): IContent | null {
   return target;
 }
 
-function uploadImgHandler(files: FileList, currentFile: IContent) {
+function uploadImgHandler(files: FileList, currentFile: IContent, sender: (v: string) => void) {
   const file = files[0];
   if (['image/png', 'image/jpeg'].indexOf(file.type) !== -1) {
     // 是一张图片
@@ -37,6 +37,7 @@ function uploadImgHandler(files: FileList, currentFile: IContent) {
           const id = currentFile.id;
           saveFile(id, value).then((data) => {
             if (data) {
+              sender(value);
               console.log('save success!');
             } else {
               console.log('save fail!');
@@ -221,15 +222,15 @@ export function initContent () {
       }, 500);
     }
   });
-  $ContentDom.uploadImage.addEventListener('change', (e) => {
-    if (e.target) {
-      const files = (e.target as HTMLInputElement).files;
-      if (!files || !currentFile) {
-        return;
-      }
-      uploadImgHandler(files, currentFile);
-    }
-  });
+  // $ContentDom.uploadImage.addEventListener('change', (e) => {
+  //   if (e.target) {
+  //     const files = (e.target as HTMLInputElement).files;
+  //     if (!files || !currentFile) {
+  //       return;
+  //     }
+  //     uploadImgHandler(files, currentFile, sender);
+  //   }
+  // });
   $ContentDom.inputBox.addEventListener('paste', (e) => {
     if (!currentFile) {
       return;
@@ -237,9 +238,11 @@ export function initContent () {
     if (e.clipboardData) {
       const {types, items, files} = e.clipboardData;
       if (types.length > 0 && items.length > 0 && files.length > 0) {
-        uploadImgHandler(files, currentFile);
+        uploadImgHandler(files, currentFile, sender);
       } else if (types.indexOf('text/plain') !== -1) {
-        sender((e.target as HTMLInputElement).value);
+        setTimeout(() => {
+          sender((e.target as HTMLInputElement).value);
+        }, 0);
       }
     }
   })
