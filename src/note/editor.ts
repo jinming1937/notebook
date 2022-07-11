@@ -4,6 +4,7 @@ import { registerDownload } from '@/component/down';
 import { registerFont, setDefFont } from '@/component/font';
 import { registerSpell, setDefSpell } from '@/component/spellcheck';
 import { $dom } from '@/util';
+import { registerSwitch } from '@/component/switch';
 
 export function initEditor() {
 
@@ -17,8 +18,16 @@ export function initEditor() {
     down: $dom<HTMLInputElement>('down')!,
     title: $dom<HTMLInputElement>('title')!,
     bg: $dom<HTMLInputElement>('upload')!,
+    isEditor: $dom<HTMLInputElement>('editorSwitch')!,
+    editorInputBox: $dom<HTMLInputElement>('editorInputBox')!,
   }
-
+  registerSwitch(tool.isEditor, (val: boolean) => {
+    if (val) {
+      tool.editorInputBox.className = 'editorInput';
+    } else {
+      tool.editorInputBox.className = 'editorInput hidden';
+    }
+  });
   registerTheme(tool.frame, tool.theme);
   registerBg(tool.bg, tool.page);
   registerDownload(tool.down, tool.title, tool.inputBox);

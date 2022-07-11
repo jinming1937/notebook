@@ -23,6 +23,7 @@ p {
   border-radius: 4px;
   margin: 10px 0;
   border-collapse: collapse;
+  overflow: scroll;
 
   .codeNo {
     text-align: right;
@@ -32,6 +33,7 @@ p {
     padding: 0 3px;
     border-right: 1px solid #c2c2c2;
     user-select: none;
+    min-width: 36px;
   }
 
   tbody {
@@ -50,6 +52,10 @@ p {
   .codeText {
     padding-left: 12px;
     color: #fff;
+
+    code pre {
+      margin: 0;
+    }
   }
 }
 
@@ -61,6 +67,7 @@ img {
   font-size: 14px;
   color: #222;
   word-break: break-all;
+  padding-bottom: 300px;
 }
 
 .frameBox b {

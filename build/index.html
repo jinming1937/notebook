@@ -33,25 +33,25 @@
         <div class="toolBar">
           <input type="button" id="down" value="导出" />
           |
-          <label for="theme">dark</label>
-          <input type="checkbox" name="theme" id="theme">
+          <label for="editorSwitch" class="button">编辑ing<input type="checkbox" id="editorSwitch" checked="true" /></label>
           |
-          <label for="spellcheck">spellcheck</label>
-          <input type="checkbox" name="spellcheck" id="spellcheck">
+          <label for="theme" class="button">dark<input type="checkbox" name="theme" id="theme"></label>
           |
-          <label for="fontSize">fontSize</label>
-          <select id="fontSize" value="14px" class="fontList">
-            <option value="12px">12px</option>
-            <option value="14px">14px</option>
-            <option value="16px">16px</option>
-          </select>
+          <label for="spellcheck" class="button">spellcheck<input type="checkbox" name="spellcheck" id="spellcheck"></label>
           |
-          <label class="uploadBtn" for="uploadImage">上传图片<input style="display: none;" placeholder="上传图片" type="file" id="uploadImage" accept=".jpg,.png,.webp"/></label>
+          <label for="fontSize" class="button">fontSize
+            <select id="fontSize" value="14px" class="fontList">
+              <option value="12px">12px</option>
+              <option value="14px">14px</option>
+              <option value="16px">16px</option>
+            </select>
+          </label>
+          <!--| <label class="button" for="uploadImage">上传图片<input style="display: none;" type="file" id="uploadImage" accept=".jpg,.png,.webp"/></label> -->
           |
-          <label class="uploadBtn" for="upload">设置背景<input style="display: none;" placeholder="上传背景" type="file" id="upload" accept=".jpg,.png,.webp"/></label>
+          <label class="button" for="upload">设置背景<input style="display: none;" type="file" id="upload" accept=".jpg,.png,.webp"/></label>
         </div>
         <div class="editorContent">
-          <div class="editorInput">
+          <div class="editorInput" id="editorInputBox">
             <textarea tabindex="1" class="inputBox" id="inputBox" cols="30" rows="90" maxlength="2700"></textarea>
           </div>
           <div class="preview">

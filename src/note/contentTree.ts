@@ -17,9 +17,11 @@ function createContentTree (list: IContent[]) {
     content.switch = typeof content.switch === 'undefined' ? (actions.indexOf(`${content.id}`) === -1 ? true : false): content.switch;
     if (content.children && content.children.length > 0 && content.children.filter(item => item.type === 'content').length > 0) {
       const cache = `<ul class="subMenu ${content.switch ? '' : 'hidden'}">${createContentTree(content.children)}</ul>`;
-      html+= `<li><div key="${content.id}" class="${content.active ? 'active': ''}">${triangle(content.switch)}${icon(content.switch)}<span>${content.name}</span></div>${cache}</li>`
+      html+= `<li><div key="${content.id}" class="${content.active ? 'active': ''}" ${content.active ? 'draggable="true"' : ''}>${
+        triangle(content.switch)
+      }${icon(content.switch)}<span>${content.name}</span></div>${cache}</li>`
     } else if (content.type === 'content') {
-      html += `<li class="${content.active ? 'active': ''}" key="${content.id}">${icon(false)}<span>${content.name}</span></li>`
+      html += `<li class="${content.active ? 'active': ''}" ${content.active ? 'draggable="true"' : ''} key="${content.id}">${icon(false)}<span>${content.name}</span></li>`
     }
   });
 
