@@ -26,3 +26,7 @@ export function clearFile() {
   $dom<HTMLInputElement>(IDS.InputBox)!.value = '';
   $dom<HTMLInputElement>(IDS.InputBox)?.blur();
 }
+
+export function clearContent() {
+  $dom<HTMLDivElement>(IDS.TreeContent)!.innerHTML = '';
+}

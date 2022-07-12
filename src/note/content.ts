@@ -222,15 +222,6 @@ export function initContent () {
       }, 500);
     }
   });
-  // $ContentDom.uploadImage.addEventListener('change', (e) => {
-  //   if (e.target) {
-  //     const files = (e.target as HTMLInputElement).files;
-  //     if (!files || !currentFile) {
-  //       return;
-  //     }
-  //     uploadImgHandler(files, currentFile, sender);
-  //   }
-  // });
   $ContentDom.inputBox.addEventListener('paste', (e) => {
     if (!currentFile) {
       return;
