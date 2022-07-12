@@ -1,7 +1,7 @@
 import { initActiveBar } from "./activeSide";
 import { initContent, renderContentTree } from "./content";
 import { initEditor } from "./editor";
-import { clearFile } from './fileList';
+import { clearContent, clearFile } from './fileList';
 import { initLogin } from "./login";
 
 export function initNote() {
@@ -17,5 +17,6 @@ export function initNote() {
     renderContentTree();
   }, () => {
     clearFile();
+    clearContent();
   });
 }

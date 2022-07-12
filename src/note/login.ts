@@ -40,7 +40,7 @@ export const initLogin = (loginCb?: () => void, logoutCb?: () => void) => {
         stop();
         sender('');
         isLogin = false;
-        loginCb && loginCb();
+        logoutCb && logoutCb();
       } else {
         if (!isLogin){ // 登录态正常，但是页面未初始化
           isLogin = true;
