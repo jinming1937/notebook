@@ -14,7 +14,7 @@ function superCode(content: string) {
     .replace(allMatch, ($1, $2, $3) => {
       if ($1) return `<var class="pink">${$1}</var>`
       if ($2) return `<var class="blue">${$2}</var>`
-      if ($3) return `<var class="pink">${$3}</var>`
+      if ($3) return `<var class="purple">${$3}</var>`
       return '';
     })
   if (!text) return '';

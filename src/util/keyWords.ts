@@ -65,7 +65,7 @@ export const savedWords = [
   'yield'
 ]
 
-export const declareSaveWord = ['arguments', 'boolean', 'char', 'class', 'const', 'enum', 'function', 'implements', 'import', 'interface', 'let', 'long', 'native', 'new', 'var', 'with', 'yield']
+export const declareSaveWord = ['arguments', 'boolean', 'char', 'class', 'const', 'enum', 'function', 'implements', 'import', 'from', 'interface', 'let', 'long', 'native', 'new', 'var', 'with', 'yield']
 
 export const attributeSaveWord = ['abstract', 'default', 'double', 'false', 'float', 'int', 'null', 'package', 'private', 'protected', 'public', 'short', 'static', 'this', 'true', 'void', 'volatile']
 
