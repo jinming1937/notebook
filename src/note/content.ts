@@ -232,7 +232,14 @@ export function initContent () {
         uploadImgHandler(files, currentFile, sender);
       } else if (types.indexOf('text/plain') !== -1) {
         setTimeout(() => {
-          sender((e.target as HTMLInputElement).value);
+          saveFile((currentFile as IContent).id, (e.target as HTMLInputElement).value).then((data) => {
+            if (data) {
+              sender((e.target as HTMLInputElement).value);
+              console.log('save success!');
+            } else {
+              console.log('save fail!');
+            }
+          });
         }, 0);
       }
     }
