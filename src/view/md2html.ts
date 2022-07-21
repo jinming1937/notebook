@@ -113,6 +113,9 @@ export function md2HTML(mdStr = '') {
   let key = 0;
   strList.forEach((item, index) => {
     const [html, tag] = formatLine(item, lastCodeTag === 'code');
+    if (tag !== 'li') {
+      lastHtmlTag = '';
+    }
     if (!tag) {
       // no tag
       lastHtmlTag = '';

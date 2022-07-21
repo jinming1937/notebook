@@ -1,5 +1,5 @@
 import { FileType, IContent } from "../entity/common";
-import { getAllContent, addContent, removeContent, changeContentTitle, uploadImg } from "../net/content";
+import { getAllContent, addContent, removeContent, changeContentTitle, uploadImg, moveContent } from "../net/content";
 import { saveFile } from "../net/file";
 import { $dom, debounce, randomNumber, sendToFrame } from "../util";
 import { readFile } from "./doc";
@@ -144,11 +144,28 @@ export function initContent () {
       (keyElement)!.className = 'active';
     }
   }
+  function createShadowElement() {
+    var element = document.createElement("div");
+    element.className = "shadow";
+    element.id = "shadowElement";
+    return element;
+  }
+  function removeShadowElement() {
+    var element = document.querySelectorAll(".shadow");
+    if (element.length > 0) {
+      element.forEach((item) => {
+        item.parentElement?.removeChild(item);
+      })
+    }
+  }
   $ContentDom.fileList.addEventListener('dragstart', (e: DragEvent) => {
     const key = (e.target as HTMLElement).getAttribute('key');
     moveItem = null;
     if (e.dataTransfer && key) {
       moveItem = getItemById(Number(key), list);
+      const img = createShadowElement();
+      (e.target as HTMLElement).appendChild(img);
+      e.dataTransfer.setDragImage(img,  -100, -100);
       e.dataTransfer.setData("Text", key);
     }
   });
@@ -157,17 +174,50 @@ export function initContent () {
   });
   $ContentDom.treeContent.addEventListener('drop', (e) => {
     e.preventDefault();
-    console.log(e);
-    const parentKey = (e.target as HTMLElement).getAttribute('key');
-    if (e.dataTransfer && parentKey) {
+    console.log(e.target);
+    const targetKey = (e.target as HTMLElement).getAttribute('key');
+    if (!targetKey) return;
+    const newParent = getItemById(Number(targetKey), list);
+    // 子元素不能移动到本身所在的父元素，子元素不能移到自身上
+    if (e.dataTransfer && newParent && moveItem?.parent !== newParent.id && moveItem?.id !== newParent.id) {
       const data = e.dataTransfer.getData("Text");
-      const moveElement = document.querySelector(`[key="${data}"]`);
-      console.log(moveItem);
-      if (moveItem && moveItem.type === 'content' && moveElement) {
-        (e.target as HTMLElement).appendChild(moveElement);
-      }
+      const moveElement = document.querySelector(`#fileList [key="${data}"]`);
+      console.log(moveItem, moveElement);
+      if (moveItem && moveElement) {
+        (moveElement as HTMLElement).draggable = false;
+        console.log('start move');
+        moveContent(moveItem.id, Number(targetKey)).then((data) => {
+          if (data) {
+            console.log('moving success!!');
 
+            // renderContentTree();
+            // return;
+
+            currentFile = null;
+            const oldParentId = moveItem?.parent;
+            const oldParent = getItemById(Number(oldParentId), list);
+            const moveElementIndex = moveElement.getAttribute('index');
+            if (oldParent && moveElementIndex) {
+              oldParent.children?.splice(Number(moveElementIndex), 1);
+              renderFileList(oldParent.children || []);
+              $ContentDom.title.value = '';
+            }
+            if (moveItem) {
+              newParent.children?.push(moveItem);
+              moveItem.active = false;
+              moveItem.editing = false;
+              if (moveItem.type === 'content') {
+                renderContent(list);
+              }
+            }
+          }
+        });
+      }
     }
+  });
+  $ContentDom.treeContent.addEventListener('dragend', (e) => {
+    console.log('end', e);
+    removeShadowElement();
   });
   $ContentDom.treeContent.addEventListener('click', (e) => {
     treeContentHandler(e);
@@ -386,7 +436,7 @@ export function initContent () {
     }
   });
   $ContentDom.addContent.addEventListener('click', (e) => {
-    const newContent = {name: '新建目录', id: randomNumber(), type: "content"};
+    const newContent = {name: '新建目录', id: randomNumber(), type: "content", editing: true};
     if (current) {
       (newContent as IContent).parent = current.id;
       if (current.children) {
@@ -408,8 +458,17 @@ export function initContent () {
     addContent<{id: number}>(newContent.name, newContent.type as FileType, current?.id || ROOT_ID).then((data) => {
       if (data.id) {
         newContent.id = data.id;
+        if (currentFile) {
+          currentFile.editing = false;
+          currentFile = null;
+          currentFile = newContent as IContent;
+          currentFile.editing = true;
+        } else {
+          currentFile = newContent as IContent;
+        }
         renderFileList(current?.children || []);
         renderContent(list);
+        $ContentDom.title.value = newContent.name;
       } else {
         console.log('error', data);
       }

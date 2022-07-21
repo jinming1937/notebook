@@ -14,7 +14,7 @@ export function renderFileList(list: IContent[]) {
     if (content.editing) {
       classList.push('active');
     }
-    html += `<li key="${content.id}" class="${classList.join(' ').trim()}" title="${content.name}">${content.name}${suffix}<s index="${index}">删</s></li>`
+    html += `<li key="${content.id}" index="${index}" class="${classList.join(' ').trim()}" title="${content.name}">${content.name}${suffix}<s index="${index}">删</s></li>`
   });
   $dom<HTMLDivElement>(IDS.FileList)!.innerHTML = html;
 }

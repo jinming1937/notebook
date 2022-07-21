@@ -17,3 +17,11 @@ export function sendToFrame() {
     (myFrame as HTMLIFrameElement)?.contentWindow?.postMessage(value, location.href);
   }
 }
+
+export function notification(girlFrame: HTMLIFrameElement) {
+  return (msg: string | {content: string, type: 'warning' | 'error' | 'info'}) => {
+    if (typeof msg === 'string') {
+      (girlFrame as HTMLIFrameElement)?.contentWindow?.postMessage({msg, type: 'tooltip'}, location.href)
+    }
+  }
+}
