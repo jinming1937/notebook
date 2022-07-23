@@ -1,65 +1,13 @@
 import { FileType, IContent } from "../entity/common";
-import { getAllContent, addContent, removeContent, changeContentTitle, uploadImg, moveContent } from "../net/content";
+import { getAllContent, addContent, removeContent, changeContentTitle, moveContent } from "../net/content";
 import { saveFile } from "../net/file";
-import { $dom, debounce, randomNumber, sendToFrame } from "../util";
-import { readFile } from "./doc";
-import { clearFile, renderFileList } from "./fileList";
+import { $dom, debounce, message, randomNumber, sendToFrame } from "../util";
+import { clearEditor, clearFile, renderFileList, readFile } from "./file";
 import { setLocalContent, removeLocalContent } from './local';
-import { renderContent } from './contentTree';
+import { createShadowElement, getItemById, removeShadowElement, renderContent, uploadImgHandler } from './contentLib';
 
 let ROOT_ID = -1;
 const list: IContent[] = [];
-
-function getItemById(id: number, list: IContent[]): IContent | null {
-  let target: IContent | null = null;
-  list.forEach((item) => {
-    if (target !== null) return;
-    if (id === item.id) {
-      target = item;
-    } else if (item.children && item.children.length > 0) {
-      target = getItemById(id, item.children);
-    }
-  });
-
-  return target;
-}
-
-function uploadImgHandler(files: FileList, currentFile: IContent, sender: (v: string) => void) {
-  const file = files[0];
-  if (['image/png', 'image/jpeg'].indexOf(file.type) !== -1) {
-    // 是一张图片
-    if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
-      const formData = new FormData()
-      formData.append('img', file);
-      uploadImg<{data: string[]}>(formData).then((data) => {
-        if (data && currentFile) {
-          const value = insertImg(data[0]);
-          const id = currentFile.id;
-          saveFile(id, value).then((data) => {
-            if (data) {
-              sender(value);
-              console.log('save success!');
-            } else {
-              console.log('save fail!');
-            }
-          });
-        }
-      }).catch((error) => {
-        console.log(error);
-      });
-    }
-  }
-}
-
-function insertImg(img: string) {
-  const host = 'http://localhost:9960';
-  const path = '/api/soft/static/';
-  const index = $dom<HTMLTextAreaElement>('inputBox')?.selectionStart;
-  const str = $dom<HTMLTextAreaElement>('inputBox')!.value
-  const value = str.slice(0, index) + `![图片](${host}${path}${img})` + str.slice(index);
-  $dom<HTMLTextAreaElement>('inputBox')!.value = value;
-  return value;
-}
 
 export function renderContentTree() {
   console.log('render');
@@ -78,6 +26,7 @@ export function initContent () {
   let current: IContent | null = null;
   let currentFile: IContent | null = null;
   let moveItem: IContent | null = null;
+  let inputTimeFlag: any = 0;
   const $ContentDom = {
     treeContent: $dom('treeContent')!, // 树区域
     fileList: $dom('fileList')!,
@@ -144,19 +93,45 @@ export function initContent () {
       (keyElement)!.className = 'active';
     }
   }
-  function createShadowElement() {
-    var element = document.createElement("div");
-    element.className = "shadow";
-    element.id = "shadowElement";
-    return element;
-  }
-  function removeShadowElement() {
-    var element = document.querySelectorAll(".shadow");
-    if (element.length > 0) {
-      element.forEach((item) => {
-        item.parentElement?.removeChild(item);
-      })
+  function addNewFile(name: string, type: FileType) {
+    const curr = current || getItemById(ROOT_ID, list);
+    if (!curr) return new Promise((resolve, reject) => {
+      message('error', 'can not find root');
+      reject('error')
+    });
+    const newContent: IContent = {
+      name,     id: randomNumber(),
+      type,     serial: 100,
+      parent: curr.id,     children: [] as IContent[],
+      editing: true
+    };
+    if (!current) {
+      current = curr;
+      current.active = true;
     }
+    current.children.push(newContent);
+    return addContent<{id: number}>(newContent.name, newContent.type, current.id).then((data) => {
+      if (data.id) {
+        newContent.id = data.id;
+        if (currentFile) {
+          currentFile.editing = false;
+          currentFile = null;
+        }
+        currentFile = newContent;
+        $ContentDom.title.value = newContent.name;
+        renderFileList(current?.children || []);
+        clearEditor()
+      } else {
+        message('error', 'request add error');
+        throw('error request add error');
+      }
+    });
+  }
+  function addFileHandler() {
+    addNewFile('新建文件', 'file')
+  }
+  function addContentHandler() {
+    addNewFile('新建目录', 'content').then(() => renderContent(list))
   }
   $ContentDom.fileList.addEventListener('dragstart', (e: DragEvent) => {
     const key = (e.target as HTMLElement).getAttribute('key');
@@ -169,9 +144,7 @@ export function initContent () {
       e.dataTransfer.setData("Text", key);
     }
   });
-  $ContentDom.treeContent.addEventListener('dragover', (e) => {
-    e.preventDefault();
-  });
+  $ContentDom.treeContent.addEventListener('dragover', (e) => e.preventDefault());
   $ContentDom.treeContent.addEventListener('drop', (e) => {
     e.preventDefault();
     console.log(e.target);
@@ -186,24 +159,25 @@ export function initContent () {
       if (moveItem && moveElement) {
         (moveElement as HTMLElement).draggable = false;
         console.log('start move');
-        moveContent(moveItem.id, Number(targetKey)).then((data) => {
+        moveContent(moveItem.id, Number(targetKey), Math.max(...newParent.children.map(i => i.serial)) + 1).then((data) => {
           if (data) {
             console.log('moving success!!');
-
-            // renderContentTree();
-            // return;
-
             currentFile = null;
             const oldParentId = moveItem?.parent;
             const oldParent = getItemById(Number(oldParentId), list);
             const moveElementIndex = moveElement.getAttribute('index');
             if (oldParent && moveElementIndex) {
-              oldParent.children?.splice(Number(moveElementIndex), 1);
+              oldParent.children.splice(Number(moveElementIndex), 1);
               renderFileList(oldParent.children || []);
               $ContentDom.title.value = '';
+              clearEditor();
             }
             if (moveItem) {
-              newParent.children?.push(moveItem);
+              if (newParent.children) {
+                newParent.children.push(moveItem); // 位置问题，这样会到最后
+              } else {
+                newParent.children = [moveItem];
+              }
               moveItem.active = false;
               moveItem.editing = false;
               if (moveItem.type === 'content') {
@@ -215,47 +189,12 @@ export function initContent () {
       }
     }
   });
-  $ContentDom.treeContent.addEventListener('dragend', (e) => {
-    console.log('end', e);
-    removeShadowElement();
-  });
-  $ContentDom.treeContent.addEventListener('click', (e) => {
-    treeContentHandler(e);
-  });
-  let inputTimeFlag: any = 0;
+  $ContentDom.treeContent.addEventListener('dragend', removeShadowElement);
+  $ContentDom.treeContent.addEventListener('click', treeContentHandler);
   $ContentDom.inputBox.addEventListener('input', (e) => {
     if ((e as InputEvent).inputType === "insertFromPaste") return;
     if (currentFile === null) {
-      currentFile = {
-        name: '新建文件',
-        id: randomNumber(),
-        type: 'file',
-      } as IContent
-      if (!current) {
-        current = getItemById(ROOT_ID, list);
-        if (current) {
-          current.active = true;
-          currentFile.parent = current.id;
-          current.children?.unshift(currentFile);
-        }
-      } else {
-        currentFile.parent = current.id;
-        if (current.children) {
-          current.children.unshift(currentFile);
-        } else {
-          current.children = [currentFile];
-        }
-      }
-      currentFile.editing = true;
-      addContent<{id: number}>(currentFile.name, currentFile.type, currentFile.parent).then((data) => {
-        if (data.id) {
-          currentFile!.id = data.id;
-          renderFileList(current?.children || []);
-          renderContent(list);
-        } else {
-          console.log('error', data);
-        }
-      });
+      addFileHandler()
     } else {
       $ContentDom.title.value = currentFile.name;
       const id = currentFile.id;
@@ -296,36 +235,7 @@ export function initContent () {
   })
   $ContentDom.title.addEventListener('input', (e) => {
     if (!currentFile) {
-      currentFile = {
-        name: '新建文件',
-        id: randomNumber(),
-        type: 'file',
-        editing: true,
-      } as IContent;
-      if (!current) {
-        current = getItemById(ROOT_ID, list);
-        if (current) {
-          current.active = true;
-          currentFile.parent = current.id;
-          current.children?.unshift(currentFile);
-        }
-      } else {
-        currentFile.parent = current.id;
-        if (current.children) {
-          current.children.unshift(currentFile);
-        } else {
-          current.children = [currentFile];
-        }
-      }
-      addContent<{id: number}>(currentFile.name, currentFile.type, currentFile.parent).then((data) => {
-        if (data.id) {
-          currentFile!.id = data.id;
-          renderFileList(current?.children || []);
-          renderContent(list);
-        } else {
-          console.log('error', data);
-        }
-      });
+      addFileHandler()
     } else {
       currentFile.name = (e.target as HTMLInputElement).value
       currentFile.editing = true;
@@ -391,7 +301,6 @@ export function initContent () {
       if (item) {
         currentFile = item;
         currentFile.editing = true;
-        // renderFileList(current?.children || []);
         readFile(currentFile);
       }
       const classList = [];
@@ -405,73 +314,6 @@ export function initContent () {
       element.draggable = true;
     }
   });
-  $ContentDom.addFile.addEventListener('click', (e) => {
-    const newFile = {name: '新建文件', id: randomNumber(), type: 'file', editing: true};
-    if (current) {
-      (newFile as IContent).parent = current.id;
-      if (current.children) {
-        current.children.unshift(newFile as IContent);
-      } else {
-        current.children = [(newFile as IContent)];
-      }
-      if (currentFile) {
-        currentFile.editing = false;
-        currentFile = null;
-        currentFile = newFile as IContent;
-        currentFile.editing = true;
-      } else {
-        currentFile = newFile as IContent;
-      }
-      addContent<{id: number}>(newFile.name, newFile.type as FileType, current.id).then((data) => {
-        if (data.id) {
-          newFile.id = data.id;
-          renderFileList(current?.children || []);
-          $ContentDom.title.value = newFile.name;
-        } else {
-          console.log('error', data);
-        }
-      });;
-    } else {
-      alert('error !!! not found root!!!');
-    }
-  });
-  $ContentDom.addContent.addEventListener('click', (e) => {
-    const newContent = {name: '新建目录', id: randomNumber(), type: "content", editing: true};
-    if (current) {
-      (newContent as IContent).parent = current.id;
-      if (current.children) {
-        current.children.unshift(newContent as IContent);
-      } else {
-        current.children = [newContent as IContent];
-      }
-    } else {
-      current = getItemById(ROOT_ID, list);
-      if (current) {
-        current.active = true;
-        (newContent as IContent).parent = current.id;
-        current.children?.unshift(newContent as IContent);
-      } else {
-        alert('error !!! not found root!!!');
-        return;
-      }
-    }
-    addContent<{id: number}>(newContent.name, newContent.type as FileType, current?.id || ROOT_ID).then((data) => {
-      if (data.id) {
-        newContent.id = data.id;
-        if (currentFile) {
-          currentFile.editing = false;
-          currentFile = null;
-          currentFile = newContent as IContent;
-          currentFile.editing = true;
-        } else {
-          currentFile = newContent as IContent;
-        }
-        renderFileList(current?.children || []);
-        renderContent(list);
-        $ContentDom.title.value = newContent.name;
-      } else {
-        console.log('error', data);
-      }
-    });
-  });
+  $ContentDom.addFile.addEventListener('click', addFileHandler);
+  $ContentDom.addContent.addEventListener('click', addContentHandler);
 }

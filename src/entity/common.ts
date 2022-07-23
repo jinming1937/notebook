@@ -18,17 +18,21 @@ export type IContent = {
   */
   parent: number;
   /**
-   * 文件夹：选中激活
+   * 文件夹的子文件/夹
+  */
+  children: IContent[];
+  /**
+   * 排序
+   */
+  serial: number;
+  /**
+   * for文件夹：选中激活
   */
   active?: boolean;
   /**
-   * 文件：选中激活
+   * for文件：选中激活
    */
   editing?: boolean;
-  /**
-   * 文件夹的子文件/夹
-  */
-  children?: IContent[];
   /**
    * TODO:只读文件/夹
   */

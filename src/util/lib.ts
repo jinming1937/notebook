@@ -25,3 +25,7 @@ export function notification(girlFrame: HTMLIFrameElement) {
     }
   }
 }
+
+export function message(type: 'error'| 'inof', msg: string) {
+  console.log(msg);
+}
