@@ -29,7 +29,7 @@ export function changeContentTitle(name: string, id: number) {
 }
 
 export function moveContent(id: number, parentId: number, sort: number) {
-  return post<{data: any}>('/api/nb/move_content', {id, parentId, sort}).then((res) => {
+  return post<{data: any}>('/api/nb/move_content', {id, parentId, sort: 100}).then((res) => {
     return res.data;
   }).catch((err) => {
     console.log(err);

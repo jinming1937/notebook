@@ -109,7 +109,7 @@ export function initContent () {
       current = curr;
       current.active = true;
     }
-    current.children.push(newContent);
+    current.children.unshift(newContent);
     return addContent<{id: number}>(newContent.name, newContent.type, current.id).then((data) => {
       if (data.id) {
         newContent.id = data.id;

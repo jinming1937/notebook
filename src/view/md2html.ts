@@ -2,7 +2,7 @@
  * MD to HTML
  */
 import { randomNum } from "@/util"
-import { regCodeEnd, regCodeStart, regContent, regCrossbar, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
+import { regCode, regCodeEnd, regCodeStart, regContent, regCrossbar, regGCode, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
 import { controlSaveWord, attributeSaveWord, declareSaveWord } from "@/util/keyWords";
 
 const allMatch = new RegExp('\\b((' + controlSaveWord.join('|') + ')|(' + declareSaveWord.join('|') + ')|(' + attributeSaveWord.join('|') + '))\\b', 'ig');
@@ -23,7 +23,7 @@ function superCode(content: string) {
 
 function format(content: string) {
   let strHtml = '';
-  [regContent, regLink, regImg].forEach((item) => {
+  [regContent, regLink, regImg, regCode].forEach((item) => {
     const result = content.match(item);
     if (result) {
       const tag = result[1]
@@ -49,7 +49,7 @@ function format(content: string) {
 
 function matchInline(content: string) {
   let formatContent = content;
-  [regGContent, regGLink, regGImg].forEach((item) => {
+  [regGContent, regGLink, regGImg, regGCode].forEach((item) => {
     const result = content.match(item);
     if (Array.isArray(result)) {
       result.forEach((time) => {
@@ -62,15 +62,11 @@ function matchInline(content: string) {
 
 function formatLine(lineStr: string, codeText: boolean) {
 
-  if (lineStr.match(regCodeEnd)) {
-    return ['', 'eCode'];
-  }
+  if (lineStr.match(regCodeEnd)) return ['', 'eCode'];
 
   if (codeText) return [superCode(lineStr), 'sCode'];
 
-  if (lineStr.match(regCodeStart)) {
-    return ['', 'sCode'];
-  }
+  if (lineStr.match(regCodeStart)) return ['', 'sCode'];
 
   if (lineStr === '') return ['', ''];
 
@@ -113,7 +109,7 @@ export function md2HTML(mdStr = '') {
   let key = 0;
   strList.forEach((item, index) => {
     const [html, tag] = formatLine(item, lastCodeTag === 'code');
-    if (tag !== 'li') {
+    if (tag !== 'li' && lastHtmlTag === 'ul' || tag !== 'lx' && lastHtmlTag === 'ol') {
       lastHtmlTag = '';
     }
     if (!tag) {

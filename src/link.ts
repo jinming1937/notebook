@@ -22,7 +22,7 @@ window.addEventListener('load', () => {
   registerTheme(tool.frame, tool.theme);
   registerBg(tool.bg, tool.page);
 
-  $dom('search')?.addEventListener('keydown', (e) => {
+  $dom('searchBookMarks')?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const key = (e.target as HTMLInputElement).value;
       if (key) {
