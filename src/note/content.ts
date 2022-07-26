@@ -121,14 +121,15 @@ export function initContent () {
         $ContentDom.title.value = newContent.name;
         renderFileList(current?.children || []);
         clearEditor()
+        sender('');
       } else {
         message('error', 'request add error');
         throw('error request add error');
       }
     });
   }
-  function addFileHandler() {
-    addNewFile('新建文件', 'file')
+  function addFileHandler(name = '新建文件') {
+    addNewFile(name, 'file')
   }
   function addContentHandler() {
     addNewFile('新建目录', 'content').then(() => renderContent(list))
@@ -171,6 +172,7 @@ export function initContent () {
               renderFileList(oldParent.children || []);
               $ContentDom.title.value = '';
               clearEditor();
+              sender('');
             }
             if (moveItem) {
               if (newParent.children) {
@@ -235,7 +237,9 @@ export function initContent () {
   })
   $ContentDom.title.addEventListener('input', (e) => {
     if (!currentFile) {
-      addFileHandler()
+      debounce(() => {
+        addFileHandler((e.target as HTMLInputElement).value);
+      }, 500);
     } else {
       currentFile.name = (e.target as HTMLInputElement).value
       currentFile.editing = true;
@@ -314,6 +318,6 @@ export function initContent () {
       element.draggable = true;
     }
   });
-  $ContentDom.addFile.addEventListener('click', addFileHandler);
-  $ContentDom.addContent.addEventListener('click', addContentHandler);
+  $ContentDom.addFile.addEventListener('click', () => addFileHandler());
+  $ContentDom.addContent.addEventListener('click', () => addContentHandler());
 }
