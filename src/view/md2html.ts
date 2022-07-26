@@ -7,9 +7,11 @@ import { controlSaveWord, attributeSaveWord, declareSaveWord } from "@/util/keyW
 
 const allMatch = new RegExp('\\b((' + controlSaveWord.join('|') + ')|(' + declareSaveWord.join('|') + ')|(' + attributeSaveWord.join('|') + '))\\b', 'ig');
 
-function superCode(content: string) {
+function superCode(content: string, codeType: string = '') {
   if (!content) return '';
-
+  if (codeType.toLocaleLowerCase() === 'html') {
+    return '<code><pre>' + content.replace(/[<]/g, '&lt;').replace(/[>]/g, '&gt;') + '</pre></code>';
+  }
   const text = content
     .replace(allMatch, ($1, $2, $3) => {
       if ($1) return `<var class="pink">${$1}</var>`
@@ -60,13 +62,14 @@ function matchInline(content: string) {
   return formatContent;
 }
 
-function formatLine(lineStr: string, codeText: boolean) {
+
+function formatLine(lineStr: string, codeText: boolean, codeType: string) {
 
   if (lineStr.match(regCodeEnd)) return ['', 'eCode'];
 
-  if (codeText) return [superCode(lineStr), 'sCode'];
+  if (codeText) return [superCode(lineStr, codeType), 'sCode'];
 
-  if (lineStr.match(regCodeStart)) return ['', 'sCode'];
+  if (lineStr.match(regCodeStart)) return ['', 'sCode', lineStr.replace(/^`{3}([a-zA-Z]+)$/, '$1')];
 
   if (lineStr === '') return ['', ''];
 
@@ -107,8 +110,9 @@ export function md2HTML(mdStr = '') {
   let lastHtmlTag = '';
   let lastCodeTag = '';
   let key = 0;
+  let codeType = ''
   strList.forEach((item, index) => {
-    const [html, tag] = formatLine(item, lastCodeTag === 'code');
+    const [html, tag, ct] = formatLine(item, lastCodeTag === 'code', codeType);
     if (tag !== 'li' && lastHtmlTag === 'ul' || tag !== 'lx' && lastHtmlTag === 'ol') {
       lastHtmlTag = '';
     }
@@ -134,6 +138,7 @@ export function md2HTML(mdStr = '') {
         htmlObj[`${lastHtmlTag}-${key}`] = [__html];
       }
     } else if (tag === 'sCode') {
+      codeType = codeType || ct || '';
       if (lastCodeTag === 'code') {
         htmlObj[`${lastCodeTag}-${key}`].push(`<div>${html}</div>`);
       } else {
@@ -143,6 +148,7 @@ export function md2HTML(mdStr = '') {
       }
     } else if (tag === 'eCode') {
       lastCodeTag = '';
+      codeType = '';
     } else {
       lastHtmlTag = tag;
       htmlObj[`${tag}-${randomNum()}`] = [html];
