@@ -148,7 +148,7 @@ export function initContent () {
   $ContentDom.treeContent.addEventListener('dragover', (e) => e.preventDefault());
   $ContentDom.treeContent.addEventListener('drop', (e) => {
     e.preventDefault();
-    console.log(e.target);
+    // console.log(e.target);
     const targetKey = (e.target as HTMLElement).getAttribute('key');
     if (!targetKey) return;
     const newParent = getItemById(Number(targetKey), list);
@@ -156,7 +156,7 @@ export function initContent () {
     if (e.dataTransfer && newParent && moveItem?.parent !== newParent.id && moveItem?.id !== newParent.id) {
       const data = e.dataTransfer.getData("Text");
       const moveElement = document.querySelector(`#fileList [key="${data}"]`);
-      console.log(moveItem, moveElement);
+      // console.log(moveItem, moveElement);
       if (moveItem && moveElement) {
         (moveElement as HTMLElement).draggable = false;
         console.log('start move');
