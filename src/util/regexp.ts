@@ -5,7 +5,7 @@ export const regSharp = /^\#/
 // 匹配 无序列表 -
 export const regCrossbar = /^(\-|\*)/
 // 匹配 有序列表 1. 2.
-export const regNumber = /^\d\./
+export const regNumber = /^\d+\./
 // 匹配行内：加粗，删除，下划线，颜色
 export const regContent = /([*~+=]{2})(.+?)\1/
 export const regGContent = /([*~+=]{2})(.+?)\1/g
