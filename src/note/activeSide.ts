@@ -21,9 +21,10 @@ export function initActiveBar() {
     $BarDom.targetBar.style.left = `${e.clientX - 1}px`;
   });
   $BarDom.activeBarMask.addEventListener('mousemove', (e) => {
-    if (flag && e.clientX <= maxWidth && e.clientX >= minWidth) {
-      $BarDom.targetBar.style.left = `${e.clientX - 1}px`;
-      $BarDom.content.style.width = `${e.clientX + 162}px`;
+    const left = e.clientX;
+    if (flag && left <= maxWidth && left >= minWidth) {
+      $BarDom.targetBar.style.left = `${left - 1}px`;
+      $BarDom.content.style.width = `${left + 167}px`;
     }
   });
   $BarDom.activeBarMask.addEventListener('mouseup', (e) => {
