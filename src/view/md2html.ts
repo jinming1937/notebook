@@ -10,7 +10,7 @@ type IFormater = {
   tag: string;
   ct: string;
   macher: string;
-  enter?: boolean;
+  doubleSpace?: boolean;
 }
 
 const allMatch = new RegExp('\\b((' + controlSaveWord.join('|') + ')|(' + declareSaveWord.join('|') + ')|(' + attributeSaveWord.join('|') + '))\\b', 'ig');
@@ -115,7 +115,7 @@ function formatLine(lineStr: string, codeText: boolean, codeType: string): IForm
 
   const inline = matchInline(lineStr);
   if (inline.length > 0) {
-    return {html: inline, tag: 'p', ct: '', macher: '', enter: !!inline.match(/[\u0020]{2}$/)};
+    return {html: inline, tag: 'p', ct: '', macher: '', doubleSpace: !!inline.match(/[\u0020]{2}$/)}; // 空格x2
   }
 
   return {html: `<div>${lineStr}</div>`, tag: 'div', ct: '', macher: ''};
@@ -131,7 +131,7 @@ export function md2HTML(mdStr = '') {
   let key = 0;
   let codeType = ''
   strList.forEach((item, index) => {
-    const {html, tag, ct, macher, enter} = formatLine(item, lastCodeTag === 'code', codeType);
+    const {html, tag, ct, macher, doubleSpace} = formatLine(item, lastCodeTag === 'code', codeType);
     if (tag !== 'li' && lastHtmlTag === 'ul' || tag !== 'lx' && lastHtmlTag === 'ol') {
       lastHtmlTag = '';
       lastMatcher = '';
@@ -171,8 +171,8 @@ export function md2HTML(mdStr = '') {
     } else if (tag === 'eCode') {
       lastCodeTag = '';
       codeType = '';
-    } else if (tag === 'p' && !enter) {
-      if (lastHtmlTag === 'p') {
+    } else if (tag === 'p' && !doubleSpace) {
+      if (lastHtmlTag === 'p' && htmlObj[`${tag}-${key}`]) {
         htmlObj[`${tag}-${key}`].push(html);
       } else {
         lastHtmlTag = tag;
