@@ -298,6 +298,8 @@ export function initContent () {
     });
     if (currentFile) {
       currentFile.editing = false;
+      clearEditor()
+      sender('');
     }
     const itemKey = element.getAttribute('key');
     if (itemKey) {

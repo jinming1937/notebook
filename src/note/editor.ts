@@ -21,6 +21,27 @@ export function initEditor() {
     isEditor: $dom<HTMLInputElement>('editorSwitch')!,
     editorInputBox: $dom<HTMLInputElement>('editorInputBox')!,
   }
+  tool.title.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      tool.inputBox.focus();
+    }
+  })
+  tool.inputBox.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 's' || e.key.toLowerCase() === 'meta')) {
+      console.log('auto saved');
+      e.preventDefault();
+      return false;
+    }
+    if (e.key.toLowerCase() === 'tab') {
+      e.preventDefault();
+      const index = tool.inputBox.selectionStart;
+      const str = tool.inputBox.value;
+      const val = str.slice(0, index) + '  ' + str.slice(index);
+      tool.inputBox.value = val;
+    }
+  }, false);
   registerSwitch(tool.isEditor, (val: boolean) => {
     if (val) {
       tool.editorInputBox.className = 'editorInput';
@@ -33,6 +54,7 @@ export function initEditor() {
   registerDownload(tool.down, tool.title, tool.inputBox);
   registerFont(tool.fontSize, tool.inputBox);
   registerSpell(tool.spellcheck, tool.inputBox);
+
   setTimeTheme(tool.frame, tool.theme);
   setDefFont(tool.fontSize, tool.inputBox);
   setDefSpell(tool.spellcheck, tool.inputBox);
