@@ -40,6 +40,14 @@ export function initEditor() {
       const str = tool.inputBox.value;
       const val = str.slice(0, index) + '  ' + str.slice(index);
       tool.inputBox.value = val;
+      // tool.inputBox.select
+      tool.inputBox.blur()
+      setTimeout(() => {
+        tool.inputBox.selectionStart = index + 2
+        tool.inputBox.selectionEnd = index + 2
+        tool.inputBox.focus()
+        // TODO save
+      }, 0);
     }
   }, false);
   registerSwitch(tool.isEditor, (val: boolean) => {
