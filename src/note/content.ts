@@ -119,6 +119,8 @@ export function initContent () {
         }
         currentFile = newContent;
         $ContentDom.title.value = newContent.name;
+        $ContentDom.title.focus();
+        $ContentDom.title.select();
         renderFileList(current?.children || []);
         clearEditor()
         sender('');
