@@ -1,6 +1,6 @@
 # Notebook
 
-My knowledge library
+一个极简的MD笔记
 
 - 安装
 

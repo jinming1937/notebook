@@ -262,6 +262,16 @@ export function initContent () {
       }, 500)
     }
   });
+  $ContentDom.title.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      if (currentFile?.type === 'file') {
+        $ContentDom.inputBox.focus();
+      } else {
+        $ContentDom.title.blur();
+      }
+    }
+  })
   $ContentDom.fileList.addEventListener('click', (e) => {
     const element = e.target as HTMLElement;
     if ((element as HTMLElement).nodeName === 'S') {

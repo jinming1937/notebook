@@ -2,7 +2,7 @@
  * MD to HTML
  */
 import { randomNum } from "@/util"
-import { regCode, regCodeEnd, regCodeStart, regContent, regCrossbar, regGCode, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
+import { regCheckBoxFalse, regCheckBoxTrue, regCode, regCodeEnd, regCodeStart, regContent, regCrossbar, regGCheckBoxFalse, regGCheckBoxTrue, regGCode, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
 import { controlSaveWord, attributeSaveWord, declareSaveWord } from "@/util/keyWords";
 
 type IFormater = {
@@ -33,7 +33,7 @@ function superCode(content: string, codeType: string = '') {
 
 function format(content: string) {
   let strHtml = '';
-  [regContent, regLink, regImg, regCode].forEach((item) => {
+  [regContent, regLink, regImg, regCode, regCheckBoxTrue, regCheckBoxFalse].forEach((item, indexer) => {
     const result = content.match(item);
     if (result) {
       const tag = result[1]
@@ -48,6 +48,8 @@ function format(content: string) {
       } else {
         if (result.input?.match(/^\!/)) {
           strHtml = `${prefix.replace(/\!$/, '')}<img src="${textOrLink}" alt="${tag}" />${suffix}`;
+        } else if (indexer === 4 || indexer === 5) {
+          strHtml = `${prefix}<input type="checkbox" readonly ${indexer === 4 ? 'checked': ''} />${suffix}`
         } else {
           strHtml = `${prefix}<a href="${textOrLink}" target="_blank" ref="noreferrer noopener nofollow">${tag}</a>${suffix}`;
         }
@@ -59,7 +61,7 @@ function format(content: string) {
 
 function matchInline(content: string) {
   let formatContent = content;
-  [regGContent, regGLink, regGImg, regGCode].forEach((item) => {
+  [regGContent, regGLink, regGImg, regGCode, regGCheckBoxTrue, regGCheckBoxFalse].forEach((item) => {
     const result = content.match(item);
     if (Array.isArray(result)) {
       result.forEach((time) => {
