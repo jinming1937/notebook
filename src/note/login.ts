@@ -63,6 +63,7 @@ export const initLogin = (loginCb?: () => void, logoutCb?: () => void) => {
           loginCb && loginCb();
         } else {
           alert('password was wrong!!');
+          $dom<HTMLInputElement>('pwd')!.select();
         }
       });
     } else {

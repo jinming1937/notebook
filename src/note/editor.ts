@@ -21,14 +21,9 @@ export function initEditor() {
     isEditor: $dom<HTMLInputElement>('editorSwitch')!,
     editorInputBox: $dom<HTMLInputElement>('editorInputBox')!,
   }
-  tool.title.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === 'Tab') {
-      e.preventDefault();
-      tool.inputBox.focus();
-    }
-  })
   tool.inputBox.addEventListener('keydown', (e) => {
     e.stopPropagation();
+    // TODO window 全局应该增加该拦截
     if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 's' || e.key.toLowerCase() === 'meta')) {
       console.log('auto saved');
       e.preventDefault();

@@ -23,8 +23,12 @@ export const TagMap = {
 // 匹配行内链接
 export const regLink = /(?<!\!)[\[](.+?)[\]][\(](.+?)[\)]/
 export const regImg = /(?<=\!)[\[](.+?)[\]][\(](.+?)[\)]/
+export const regCheckBoxFalse = /\[\]/;
+export const regCheckBoxTrue = /\[x\]/;
 export const regGLink = /(?<!\!)[\[](.+?)[\]][\(](.+?)[\)]/g
 export const regGImg = /(?<=\!)[\[](.+?)[\]][\(](.+?)[\)]/g
+export const regGCheckBoxFalse = /\[\]/g;
+export const regGCheckBoxTrue = /\[x\]/g;
 
 export const regCodeStart = /^`{3}[a-zA-Z]*$/
 export const regCodeEnd = /^`{3}$/
