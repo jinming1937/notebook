@@ -142,7 +142,7 @@ export function initContent () {
     if (e.dataTransfer && key) {
       moveItem = getItemById(Number(key), list);
       const img = createShadowElement();
-      (e.target as HTMLElement).appendChild(img);
+      // (e.target as HTMLElement).appendChild(img);
       e.dataTransfer.setDragImage(img,  -100, -100);
       e.dataTransfer.setData("Text", key);
     }
