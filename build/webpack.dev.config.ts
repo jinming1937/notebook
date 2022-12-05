@@ -45,6 +45,7 @@ const config = {
     })
   ],
   devServer: {
+    port: 9292,
     proxy:  {
       '/api': {
         target: `http://127.0.0.1:9960`,

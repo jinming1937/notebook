@@ -1,3 +1,12 @@
+@DarkPink: #ffa6e9;
+@LightPink: #da23ac;
+
+@DarkBoldBG: #ff8be2;
+@LightBoldBG: #ff68d9;
+
+@DarkBoldColor: #feffbb;
+@LightBoldColor: #fbff09;
+
 * {
   box-sizing: border-box;
 }
@@ -96,12 +105,12 @@ img {
 }
 
 .frameBox b {
-  color: #fbff09;
-  background: #ff68d9;
+  color: @LightBoldColor;
+  background: @LightBoldBG;
 }
 
 .pink {
-  color: #da23ac;
+  color: @LightPink;
 }
 
 .blue {
@@ -142,6 +151,15 @@ img {
 
 .frameBox.dark {
   color: #eee;
+
+  .pink {
+    color: @DarkPink;
+  }
+
+  b {
+    color: @DarkBoldColor;
+    background: @DarkBoldBG;
+  }
 
   a {
     color: #9acbff;

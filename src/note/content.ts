@@ -178,7 +178,7 @@ export function initContent () {
             }
             if (moveItem) {
               if (newParent.children) {
-                newParent.children.push(moveItem); // 位置问题，这样会到最后
+                newParent.children.unshift(moveItem); // 位置问题，这样会到最后
               } else {
                 newParent.children = [moveItem];
               }
