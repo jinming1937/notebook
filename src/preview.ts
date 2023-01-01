@@ -1,5 +1,6 @@
 import {md2HTML} from './view/md2html';
-import { $dom, $parentDom } from './util';
+import {$dom, $parentDom} from './util';
+import './css/preview.less'
 
 function timeTheme() {
   const bgFlag = ($parentDom('theme') as HTMLInputElement)!.checked
