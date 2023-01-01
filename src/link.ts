@@ -3,6 +3,7 @@ import { initLogin } from './note/login';
 import { getFileById, searchFileByKey } from './net/file';
 import { registerTheme } from '@/component/theme';
 import { registerBg } from '@/component/background';
+import './css/link.less'
 
 window.addEventListener('load', () => {
   console.log('load ready');

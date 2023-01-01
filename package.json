@@ -4,20 +4,21 @@
   "description": "notebook",
   "main": "index.js",
   "repository": "git@github.com:jinming1937/notebook.git",
-  "author": "jinming.1937 <jinming.1937@bytedance.com>",
+  "author": "jinming1937 <jinming1937@163.com>",
   "license": "MIT",
   "scripts": {
     "dev": "webpack serve --config ./build/webpack.dev.config.ts",
-    "start": "",
-    "build": ""
+    "build": "rm -rf dist && webpack --mode=production --config ./build/webpack.pro.config.ts"
   },
   "devDependencies": {
+    "@types/optimize-css-assets-webpack-plugin": "^5.0.5",
     "css-loader": "^6.5.1",
     "eslint": "^8.8.0",
     "html-webpack-plugin": "^5.5.0",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
     "mini-css-extract-plugin": "^2.5.3",
+    "optimize-css-assets-webpack-plugin": "^6.0.1",
     "prettier": "^2.5.1",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.2.6",
