@@ -75,7 +75,7 @@ export function uploadImgHandler(files: FileList, currentFile: IContent, sender:
   }
 }
 export function insertImg(img: string) {
-  const host = 'http://localhost:9960';
+  const host = 'http://m.lit.cn'; // 需要代理成127.0.0.1:9960,or Analysis图片服务
   const path = '/api/soft/static/';
   const index = $dom<HTMLTextAreaElement>('inputBox')?.selectionStart;
   const str = $dom<HTMLTextAreaElement>('inputBox')!.value
