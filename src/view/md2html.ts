@@ -46,7 +46,7 @@ function format(content: string) {
       if (TagMap[tag]) {
         strHtml = `${prefix}<${TagMap[tag]}>${textOrLink}</${TagMap[tag]}>${suffix}`;
       } else {
-        if (result.input?.match(/^\!/)) {
+        if (result.input?.match(regImg)) {
           strHtml = `${prefix.replace(/\!$/, '')}<img src="${textOrLink}" alt="${tag}" />${suffix}`;
         } else if (indexer === 4 || indexer === 5) {
           strHtml = `${prefix}<input type="checkbox" readonly ${indexer === 4 ? 'checked': ''} />${suffix}`
