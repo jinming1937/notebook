@@ -2,7 +2,7 @@
  * MD to HTML
  */
 import { randomNum } from "@/util"
-import { regCheckBoxFalse, regCheckBoxTrue, regCode, regCodeEnd, regCodeStart, regContent, regCrossbar, regGCheckBoxFalse, regGCheckBoxTrue, regGCode, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "@/util/regexp"
+import { regCheckBoxFalse, regCheckBoxTrue, regCode, regCodeEnd, regCodeStart, regContent, regCrossbar, regGCheckBoxFalse, regGCheckBoxTrue, regGCode, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "./regexp"
 import { controlSaveWord, attributeSaveWord, declareSaveWord } from "@/util/keyWords";
 
 type IFormater = {

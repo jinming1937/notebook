@@ -162,7 +162,8 @@ export function initContent () {
       if (moveItem && moveElement) {
         (moveElement as HTMLElement).draggable = false;
         console.log('start move');
-        moveContent(moveItem.id, Number(targetKey), Math.max(...newParent.children.map(i => i.serial)) + 1).then((data) => {
+        const sort = newParent.children.length === 0 ? 100 : (Math.max(...newParent.children.map(i => i.serial)) + 1)
+        moveContent(moveItem.id, Number(targetKey), sort).then((data) => {
           if (data) {
             console.log('moving success!!');
             currentFile = null;
