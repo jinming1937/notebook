@@ -1,7 +1,8 @@
+import { encodeText } from "@/util";
 import { get, IRes, post } from "./http";
 
 export function saveFile<T>(id: number, value: string) {
-  return post<IRes<T>>('/api/nb/save_file', {id, value}).then((data) => {
+  return post<IRes<T>>('/api/nb/save_file', {id, value: encodeText(value)}).then((data) => {
     return data.data;
   }).catch((err) => {
     console.log(err);

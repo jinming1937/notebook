@@ -1,4 +1,4 @@
-import { $dom, sendToFrame } from './util';
+import { $dom, decodeText, encodeText, sendToFrame } from './util';
 import { initLogin } from './note/login';
 import { getFileById, searchFileByKey } from './net/file';
 import { registerTheme } from '@/component/theme';
@@ -27,11 +27,11 @@ window.addEventListener('load', () => {
     if (e.key === 'Enter') {
       const key = (e.target as HTMLInputElement).value;
       if (key) {
-        searchFileByKey<{id: number; content: string}[]>(key).then((data) => {
+        searchFileByKey<{id: number; content: string}[]>(encodeText(key)).then((data) => {
           if (Array.isArray(data)) {
             let html = '';
             data.forEach((item) => {
-              html += `<li key="${item.id}">${item.content.slice(0, 30)}...</li>`;
+              html += `<li key="${item.id}">${decodeText(item.content).slice(0, 30)}...</li>`;
             })
             $dom<HTMLUListElement>('searchResult')!.innerHTML = html;
           }
@@ -45,7 +45,8 @@ window.addEventListener('load', () => {
     if (dom && (dom as HTMLLIElement).getAttribute('key')?.match(/\d+/)) {
       const id = (dom as HTMLLIElement).getAttribute('key') || '';
       getFileById<{content: string}>(id).then((data) => {
-        sender(data ? data.content : '')
+        const text = decodeText(data ? data.content : '');
+        sender(text)
       });
     }
   })

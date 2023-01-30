@@ -1,6 +1,6 @@
 import { IContent } from "@/entity/common";
 import { getFile } from "@/net/file";
-import { $dom, sendToFrame } from "@/util";
+import { $dom, decodeText, sendToFrame } from "@/util";
 import { IDS } from './ids';
 
 export function renderFileList(list: IContent[]) {
@@ -42,8 +42,9 @@ export function readFile(currentFile: IContent) {
   $dom<HTMLInputElement>(IDS.Title)!.value = currentFile.name;
   if (currentFile.type === 'file') {
     getFile<{content: string}>(currentFile.id).then((data) => {
-      $dom<HTMLInputElement>(IDS.InputBox)!.value = data ? data.content : '';
-      sender(data ? data.content : '')
+      const text = decodeText(data ? data.content : '');
+      $dom<HTMLInputElement>(IDS.InputBox)!.value = text;
+      sender(text)
     });
   } else {
     sender('')
