@@ -8,6 +8,7 @@ import { createShadowElement, getItemById, removeShadowElement, renderContent, u
 
 let ROOT_ID = -1;
 const list: IContent[] = [];
+const AUTO_SAVE_DELAY_TIME = 5000
 
 export function renderContentTree() {
   console.log('render');
@@ -213,7 +214,7 @@ export function initContent () {
             console.log('save fail!');
           }
         });
-      }, 500);
+      }, AUTO_SAVE_DELAY_TIME);
     }
   });
   $ContentDom.inputBox.addEventListener('paste', (e) => {

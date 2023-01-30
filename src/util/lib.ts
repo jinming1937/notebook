@@ -26,6 +26,13 @@ export function notification(girlFrame: HTMLIFrameElement) {
   }
 }
 
-export function message(type: 'error'| 'inof', msg: string) {
+export function message(type: 'error'| 'info', msg: string) {
   console.log(msg);
+}
+
+export function encodeText(str = '') {
+  return str ? window.btoa(encodeURI(str)) : '';
+}
+export function decodeText(str = '') {
+  return str ? decodeURI(window.atob(str)) : '';
 }
