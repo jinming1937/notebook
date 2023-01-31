@@ -204,10 +204,11 @@ export function initContent () {
     } else {
       $ContentDom.title.value = currentFile.name;
       const id = currentFile.id;
+      const needSaveValue = (e.target as HTMLInputElement).value;
+      debounce(() => sender(needSaveValue), 300);
       clearTimeout(inputTimeFlag);
       inputTimeFlag = setTimeout(() => {
-        sender((e.target as HTMLInputElement).value);
-        saveFile(id, (e.target as HTMLInputElement).value).then((data) => {
+        saveFile(id, needSaveValue).then((data) => {
           if (data) {
             console.log('save success!');
           } else {
@@ -226,10 +227,12 @@ export function initContent () {
       if (types.length > 0 && items.length > 0 && files.length > 0) {
         uploadImgHandler(files, currentFile, sender);
       } else if (types.indexOf('text/plain') !== -1) {
+        const needSaveValue = (e.target as HTMLInputElement).value;
+        const needSaveId = (currentFile as IContent).id;
         setTimeout(() => {
-          saveFile((currentFile as IContent).id, (e.target as HTMLInputElement).value).then((data) => {
+          saveFile(needSaveId, needSaveValue).then((data) => {
             if (data) {
-              sender((e.target as HTMLInputElement).value);
+              sender(needSaveValue);
               console.log('save success!');
             } else {
               console.log('save fail!');
