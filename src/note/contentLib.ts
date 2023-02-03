@@ -1,6 +1,5 @@
 import { IContent } from "@/entity/common";
 import { uploadImg } from "@/net/content";
-import { saveFile } from "@/net/file";
 import { $dom } from "@/util";
 
 const icon = (state: boolean | undefined) => `<span class="file_icon ${state ? 'open': 'close'}"></span>`;
@@ -48,7 +47,7 @@ export function getItemById(id: number, list: IContent[]): IContent | null {
 
   return target;
 }
-export function uploadImgHandler(files: FileList, currentFile: IContent, sender: (v: string) => void) {
+export function uploadImgHandler(files: FileList, currentFile: IContent, callback: (v: string) => void) {
   const file = files[0];
   if (['image/png', 'image/jpeg'].indexOf(file.type) !== -1) {
     // 是一张图片
@@ -58,15 +57,7 @@ export function uploadImgHandler(files: FileList, currentFile: IContent, sender:
       uploadImg<{data: string[]}>(formData).then((data) => {
         if (data && currentFile) {
           const value = insertImg(data[0]);
-          const id = currentFile.id;
-          saveFile(id, value).then((data) => {
-            if (data) {
-              sender(value);
-              console.log('save success!');
-            } else {
-              console.log('save fail!');
-            }
-          });
+          callback(value);
         }
       }).catch((error) => {
         console.log(error);
