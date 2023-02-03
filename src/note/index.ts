@@ -13,6 +13,7 @@ export function initNote() {
   initActiveBar();
   // 安全管理
   initLogin(() => {
+    console.log('login')
     clearFile();
     renderContentTree();
   }, () => {

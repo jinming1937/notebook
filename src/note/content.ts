@@ -38,7 +38,6 @@ export function initContent () {
     addContent: $dom<HTMLInputElement>('addContent')!
   }
   const sender = sendToFrame()
-  renderContentTree()
 
   function treeContentHandler(e: MouseEvent | TouchEvent) {
     const element = e.target as HTMLElement;
@@ -197,7 +196,7 @@ export function initContent () {
   });
   $ContentDom.treeContent.addEventListener('dragend', removeShadowElement);
   $ContentDom.treeContent.addEventListener('click', treeContentHandler);
-  $ContentDom.inputBox.addEventListener('input', (e) => {
+  function writing(e: any) {
     if ((e as InputEvent).inputType === "insertFromPaste") return;
     if (currentFile === null) {
       addFileHandler()
@@ -217,7 +216,8 @@ export function initContent () {
         });
       }, AUTO_SAVE_DELAY_TIME);
     }
-  });
+  }
+  $ContentDom.inputBox.addEventListener('input', writing);
   $ContentDom.inputBox.addEventListener('paste', (e) => {
     if (!currentFile) {
       return;
@@ -225,20 +225,14 @@ export function initContent () {
     if (e.clipboardData) {
       const {types, items, files} = e.clipboardData;
       if (types.length > 0 && items.length > 0 && files.length > 0) {
-        uploadImgHandler(files, currentFile, sender);
-      } else if (types.indexOf('text/plain') !== -1) {
-        const needSaveValue = (e.target as HTMLInputElement).value;
-        const needSaveId = (currentFile as IContent).id;
+        uploadImgHandler(files, currentFile, (val) => {
+          sender(val);
+          writing({target: e.target, inputType: ''});
+        });
+      } else {
         setTimeout(() => {
-          saveFile(needSaveId, needSaveValue).then((data) => {
-            if (data) {
-              sender(needSaveValue);
-              console.log('save success!');
-            } else {
-              console.log('save fail!');
-            }
-          });
-        }, 0);
+          writing({target: e.target, inputType: ''})
+        }, 0)
       }
     }
   })
