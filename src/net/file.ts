@@ -8,7 +8,11 @@ export function saveFile<T>(id: number, value: string) {
     console.log(err);
   })
 }
-
+/**
+ * 跟据目录下关联的目录id查找文件
+ * @param id id
+ * @returns
+ */
 export function getFile<T>(id: number) {
   return get<IRes<T>>(`/api/nb/get_file?id=${id}`).then((data) => {
     return data.data;

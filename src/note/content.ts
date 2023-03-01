@@ -1,19 +1,19 @@
 import { FileType, IContent } from "../entity/common";
-import { getAllContent, addContent, removeContent, changeContentTitle, moveContent } from "../net/content";
+import { getContentTree, addContent, removeContent, changeContentTitle, moveContent, getFileList } from "../net/content";
 import { saveFile } from "../net/file";
 import { $dom, debounce, message, randomNumber, sendToFrame } from "../util";
-import { clearEditor, clearFile, renderFileList, readFile } from "./file";
+import { clearEditor, clearFile, renderFileList, readFileById } from "./file";
 import { setLocalContent, removeLocalContent } from './local';
 import { createShadowElement, getItemById, removeShadowElement, renderContent, uploadImgHandler } from './contentLib';
 
 let ROOT_ID = -1;
 const list: IContent[] = [];
-const AUTO_SAVE_DELAY_TIME = 5000
+const AUTO_SAVE_DELAY_TIME = 1000
 
 export function renderContentTree() {
   console.log('render');
   // 获取数据
-  getAllContent<IContent>().then((data: IContent) => {
+  getContentTree<IContent>().then((data: IContent) => {
     if (data) {
       list.length = 0;
       list.push(data);
@@ -28,6 +28,7 @@ export function initContent () {
   let currentFile: IContent | null = null;
   let moveItem: IContent | null = null;
   let inputTimeFlag: any = 0;
+  const currentFileList: IContent[] = [];
   const $ContentDom = {
     treeContent: $dom('treeContent')!, // 树区域
     fileList: $dom('fileList')!,
@@ -84,12 +85,15 @@ export function initContent () {
     const keyElement = element.getAttribute('key') ? element : element.parentElement;
     if (keyElement?.getAttribute('key')) {
       const id = (keyElement)!.getAttribute('key') || '';
-      const item = getItemById(parseInt(id), list);
-      if (item) {
-        current = item;
-        current.active = true;
-        renderFileList(item.children || []);
-      }
+      getFileList<IContent[]>(id).then((data) => {
+        const item = getItemById(parseInt(id), list);
+        if (item) {
+          current = item;
+          current.active = true;
+        }
+        currentFileList.push(...data);
+        renderFileList(data || []);
+      });
       (keyElement)!.className = 'active';
     }
   }
@@ -255,7 +259,7 @@ export function initContent () {
           if (data) {
             console.log('success');
             renderContent(list);
-            renderFileList(current?.children || []);
+            renderFileList(currentFileList || []);
           }
         })
       }, 500)
@@ -292,7 +296,7 @@ export function initContent () {
 
         removeContent(id).then((data) => {
           if (data) {
-            renderFileList(current?.children || []);
+            getFileList<IContent[]>(id).then((data) => renderFileList(data))
             if (parentNode.type === 'content') {
               renderContent(list);
             }
@@ -314,11 +318,12 @@ export function initContent () {
     }
     const itemKey = element.getAttribute('key');
     if (itemKey) {
-      const item = getItemById(parseInt(itemKey), list);
+      const id = parseInt(itemKey);
+      const item = currentFileList.find(i => i.id === id);
       if (item) {
         currentFile = item;
         currentFile.editing = true;
-        readFile(currentFile);
+        readFileById(id, element.className, element.title);
       }
       const classList = [];
       if (item?.type === 'file') {
