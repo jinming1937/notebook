@@ -4,7 +4,7 @@ import { saveFile } from "../net/file";
 import { $dom, debounce, message, randomNumber, sendToFrame } from "../util";
 import { clearEditor, clearFile, renderFileList, readFileById } from "./file";
 import { setLocalContent, removeLocalContent } from './local';
-import { createShadowElement, getItemById, removeShadowElement, renderContent, uploadImgHandler } from './contentLib';
+import { createShadowElement, getTreeItemById, removeShadowElement, renderContent, uploadImgHandler } from './contentLib';
 
 let ROOT_ID = -1;
 const list: IContent[] = [];
@@ -42,9 +42,10 @@ export function initContent () {
 
   function treeContentHandler(e: MouseEvent | TouchEvent) {
     const element = e.target as HTMLElement;
+    // 点击三角
     if (element.className.match('triangle') !== null) {
       const id = element.parentElement?.getAttribute('key') || '';
-      const item = getItemById(parseInt(id), list);
+      const item = getTreeItemById(parseInt(id), list);
       item!.switch = !item?.switch;
       const parentDom = document.querySelector(`[key="${id}"]`);
       const close = item?.switch ? 'close': '';
@@ -58,17 +59,12 @@ export function initContent () {
       }
       return;
     }
+    // 清除dom && 清除 list 对象树上的active
     $ContentDom.treeContent.querySelectorAll('[key]').forEach((target) => {
-      // 清除dom && 清除 list 对象树上的active
       target.className = '';
-      const key = target.getAttribute('key') || '';
-      const cur = getItemById(parseInt(key), list);
-      if (cur && cur.active) {
-        cur.active = false;
-      }
     });
+    // 清除 file list dom
     $ContentDom.fileList.querySelectorAll('[key]').forEach((target) => {
-      // 清除 file list dom
       target.className = '';
     });
     clearFile();
@@ -85,12 +81,13 @@ export function initContent () {
     const keyElement = element.getAttribute('key') ? element : element.parentElement;
     if (keyElement?.getAttribute('key')) {
       const id = (keyElement)!.getAttribute('key') || '';
+      const item = getTreeItemById(parseInt(id), list);
+      if (item) {
+        current = item;
+        current.active = true;
+      }
       getFileList<IContent[]>(id).then((data) => {
-        const item = getItemById(parseInt(id), list);
-        if (item) {
-          current = item;
-          current.active = true;
-        }
+        currentFileList.length = 0;
         currentFileList.push(...data);
         renderFileList(data || []);
       });
@@ -98,7 +95,7 @@ export function initContent () {
     }
   }
   function addNewFile(name: string, type: FileType) {
-    const curr = current || getItemById(ROOT_ID, list);
+    const curr = current || getTreeItemById(ROOT_ID, list);
     if (!curr) return new Promise((resolve, reject) => {
       message('error', 'can not find root');
       reject('error')
@@ -113,7 +110,10 @@ export function initContent () {
       current = curr;
       current.active = true;
     }
-    current.children.unshift(newContent);
+    if (type === 'content') {
+      current.children.unshift(newContent);
+    }
+    currentFileList.unshift(newContent);
     return addContent<{id: number}>(newContent.name, newContent.type, current.id).then((data) => {
       if (data.id) {
         newContent.id = data.id;
@@ -125,7 +125,8 @@ export function initContent () {
         $ContentDom.title.value = newContent.name;
         $ContentDom.title.focus();
         $ContentDom.title.select();
-        renderFileList(current?.children || []);
+
+        renderFileList(currentFileList || []);
         clearEditor()
         sender('');
       } else {
@@ -144,7 +145,7 @@ export function initContent () {
     const key = (e.target as HTMLElement).getAttribute('key');
     moveItem = null;
     if (e.dataTransfer && key) {
-      moveItem = getItemById(Number(key), list);
+      moveItem = currentFileList.find(i => i.id === Number(key)) as (IContent | null);
       const img = createShadowElement();
       // (e.target as HTMLElement).appendChild(img);
       e.dataTransfer.setDragImage(img,  -100, -100);
@@ -154,29 +155,32 @@ export function initContent () {
   $ContentDom.treeContent.addEventListener('dragover', (e) => e.preventDefault());
   $ContentDom.treeContent.addEventListener('drop', (e) => {
     e.preventDefault();
-    // console.log(e.target);
-    const targetKey = (e.target as HTMLElement).getAttribute('key');
-    if (!targetKey) return;
-    const newParent = getItemById(Number(targetKey), list);
+    const contentKey = (e.target as HTMLElement).getAttribute('key');
+    if (!contentKey) return;
+    const newParent = getTreeItemById(Number(contentKey), list);
     // 子元素不能移动到本身所在的父元素，子元素不能移到自身上
     if (e.dataTransfer && newParent && moveItem?.parent !== newParent.id && moveItem?.id !== newParent.id) {
       const data = e.dataTransfer.getData("Text");
       const moveElement = document.querySelector(`#fileList [key="${data}"]`);
-      // console.log(moveItem, moveElement);
       if (moveItem && moveElement) {
         (moveElement as HTMLElement).draggable = false;
         console.log('start move');
-        const sort = newParent.children.length === 0 ? 100 : (Math.max(...newParent.children.map(i => i.serial)) + 1)
-        moveContent(moveItem.id, Number(targetKey), sort).then((data) => {
+        moveContent(moveItem.id, Number(contentKey)).then((data) => {
           if (data) {
             console.log('moving success!!');
             currentFile = null;
             const oldParentId = moveItem?.parent;
-            const oldParent = getItemById(Number(oldParentId), list);
+            const oldParent = getTreeItemById(Number(oldParentId), list);
             const moveElementIndex = moveElement.getAttribute('index');
             if (oldParent && moveElementIndex) {
-              oldParent.children.splice(Number(moveElementIndex), 1);
-              renderFileList(oldParent.children || []);
+              if (moveItem?.type === 'content') {
+                oldParent.children.splice(Number(moveElementIndex), 1);
+              }
+              getFileList<IContent[]>(`${oldParentId}`).then((data) => {
+                currentFileList.length = 0;
+                currentFileList.push(...data);
+                renderFileList(data || []);
+              });
               $ContentDom.title.value = '';
               clearEditor();
               sender('');
@@ -191,8 +195,11 @@ export function initContent () {
               moveItem.editing = false;
               if (moveItem.type === 'content') {
                 renderContent(list);
+                moveItem = null;
               }
             }
+          } else {
+            console.log('error');
           }
         });
       }
@@ -249,7 +256,7 @@ export function initContent () {
       currentFile.name = (e.target as HTMLInputElement).value
       currentFile.editing = true;
       if (!current) {
-        current = getItemById(ROOT_ID, list);
+        current = getTreeItemById(ROOT_ID, list);
         if (current) {
           current.active = true;
         }
@@ -280,23 +287,28 @@ export function initContent () {
     if ((element as HTMLElement).nodeName === 'S') {
       const index = (element as HTMLElement).getAttribute('index') || '0';
       const id = (element!.parentNode as HTMLDivElement)!.getAttribute('key') || '';
-      const currentNode = getItemById(parseInt(id), list);
-      const parentNode = getItemById(currentNode?.parent || ROOT_ID, list);
-      const confirm = window.confirm(`Do you want to delete the file:[${currentNode?.name}] ?`);
+      const name = (element!.parentNode as HTMLDivElement)!.title;
+      const parentNode = current;
+      const confirm = window.confirm(`Do you want to delete the file:[${name}] ?`);
       if (!confirm) {
         return;
       }
       if (parentNode && parentNode.children) {
-        if (current) current = parentNode;
         if (currentFile) {
           currentFile = null;
           $ContentDom.title.value = '';
         }
-        parentNode.children.splice(parseInt(index), 1);
-
-        removeContent(id).then((data) => {
-          if (data) {
-            getFileList<IContent[]>(id).then((data) => renderFileList(data))
+        const deleteItem = currentFileList.find((i, ind) => ind === parseInt(index));
+        if (deleteItem && deleteItem.type === 'content') {
+          parentNode.children.splice(parseInt(index), 1);
+        }
+        removeContent(id).then((res) => {
+          if (res) {
+            getFileList<IContent[]>(id).then((data) => {
+              currentFileList.length = 0;
+              currentFileList.push(...data);
+              renderFileList(data || []);
+            });
             if (parentNode.type === 'content') {
               renderContent(list);
             }

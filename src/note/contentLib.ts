@@ -34,14 +34,14 @@ export function renderContent(list: IContent[]) {
   $dom<HTMLDivElement>('treeContent')!.innerHTML = html_;
 }
 
-export function getItemById(id: number, list: IContent[]): IContent | null {
+export function getTreeItemById(id: number, list: IContent[]): IContent | null {
   let target: IContent | null = null;
   list.forEach((item) => {
     if (target !== null) return;
     if (id === item.id) {
       target = item;
     } else if (item.children && item.children.length > 0) {
-      target = getItemById(id, item.children);
+      target = getTreeItemById(id, item.children);
     }
   });
 
