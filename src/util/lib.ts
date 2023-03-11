@@ -31,8 +31,8 @@ export function message(type: 'error'| 'info', msg: string) {
 }
 
 export function encodeText(str = '') {
-  return str ? window.btoa(encodeURI(str)) : '';
+  return str ? encodeURI(str) : '';
 }
-export function decodeText(str = '') {
-  return str ? decodeURI(window.atob(str)) : '';
+export function decodeText(str = '', time = '') {
+  return str ? decodeURI(str) : '';
 }

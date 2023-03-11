@@ -1,4 +1,4 @@
-import { $dom, decodeText, encodeText, sendToFrame } from './util';
+import { $dom, encodeText, sendToFrame } from './util';
 import { initLogin } from './note/login';
 import { getFileById, searchFileByKey } from './net/file';
 import { registerTheme } from '@/component/theme';
@@ -31,7 +31,7 @@ window.addEventListener('load', () => {
           if (Array.isArray(data)) {
             let html = '';
             data.forEach((item) => {
-              html += `<li key="${item.id}">${decodeText(item.content).slice(0, 30)}...</li>`;
+              html += `<li key="${item.id}">${decodeURI(item.content).slice(0, 30)}...</li>`;
             })
             $dom<HTMLUListElement>('searchResult')!.innerHTML = html;
           }
@@ -45,7 +45,7 @@ window.addEventListener('load', () => {
     if (dom && (dom as HTMLLIElement).getAttribute('key')?.match(/\d+/)) {
       const id = (dom as HTMLLIElement).getAttribute('key') || '';
       getFileById<{content: string}>(id).then((data) => {
-        const text = decodeText(data ? data.content : '');
+        const text = decodeURI(data ? data.content : '');
         sender(text)
       });
     }

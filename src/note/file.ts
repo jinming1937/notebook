@@ -36,13 +36,12 @@ export function clearContent() {
   $dom<HTMLDivElement>(IDS.TreeContent)!.innerHTML = '';
 }
 
-
 const sender = sendToFrame();
-export function readFile(currentFile: IContent) {
-  $dom<HTMLInputElement>(IDS.Title)!.value = currentFile.name;
-  if (currentFile.type === 'file') {
-    getFile<{content: string}>(currentFile.id).then((data) => {
-      const text = decodeText(data ? data.content : '');
+export function readFileById(id: number, type: string, name: string) {
+  $dom<HTMLInputElement>(IDS.Title)!.value = name;
+  if (type === 'file') {
+    getFile<{content: string, update_time: string}>(id).then((data) => {
+      const text = decodeText(data ? data.content : '', data?.update_time);
       $dom<HTMLInputElement>(IDS.InputBox)!.value = text;
       sender(text)
     });

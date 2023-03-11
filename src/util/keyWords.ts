@@ -62,11 +62,16 @@ export const savedWords = [
   'volatile',
   'while',
   'with',
-  'yield'
+  'yield',
+
+  'Promise', 'then', 'setTimeout',
 ]
-
-export const declareSaveWord = ['arguments', 'boolean', 'char', 'class', 'const', 'enum', 'function', 'implements', 'import', 'from', 'interface', 'let', 'long', 'native', 'new', 'var', 'with', 'yield']
-
-export const attributeSaveWord = ['abstract', 'default', 'double', 'false', 'float', 'int', 'null', 'package', 'private', 'protected', 'public', 'short', 'static', 'this', 'true', 'void', 'volatile']
-
-export const controlSaveWord = ['break', 'byte', 'case', 'catch', 'continue', 'debugger', 'delete', 'do', 'else', 'eval', 'export', 'extends', 'final', 'finally', 'for', 'goto', 'if', 'in', 'instanceof', 'return', 'super', 'switch', 'synchronized', 'throw', 'throws', 'transient', 'try', 'typeof', 'while']
+/** pink */
+export const controlSaveWord = ['break', 'byte', 'case', 'catch', 'continue', 'debugger', 'delete', 'do', 'else', 'eval', 'export', 'extends', 'for', 'goto', 'if', 'in', 'instanceof', 'return', 'super', 'switch', 'synchronized', 'throw', 'throws', 'transient', 'try', 'typeof', 'while']
+/** blue */
+export const declareSaveWord = [
+  'arguments', 'char', 'class',  'implements', 'import', 'interface', 'long', 'native', 'with', 'yield',
+  'Promise', 'then', 'setTimeout', 'final', 'finally',
+]
+/** purple */
+export const attributeSaveWord = ['abstract', 'boolean', 'default', 'double', 'false', 'float', 'int', 'from',  'const', 'enum', 'function', 'new', 'var', 'null', 'let',  'package', 'private', 'protected', 'public', 'short', 'static', 'this', 'true', 'void', 'volatile']

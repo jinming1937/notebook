@@ -6,7 +6,7 @@ export function addContent<T>(name: string, type: FileType, parentId: number) {
     return res.data;
   }).catch((err) => {
     console.log(err);
-    return {id: 0};
+    return null;
   })
 }
 
@@ -28,8 +28,8 @@ export function changeContentTitle(name: string, id: number) {
   })
 }
 
-export function moveContent(id: number, parentId: number, sort: number) {
-  return post<{data: any}>('/api/nb/move_content', {id, parentId, sort}).then((res) => {
+export function moveContent(id: number, parentId: number) {
+  return post<{data: any}>('/api/nb/move_content', {id, parentId}).then((res) => {
     return res.data;
   }).catch((err) => {
     console.log(err);
@@ -37,14 +37,14 @@ export function moveContent(id: number, parentId: number, sort: number) {
   })
 }
 
-export function getAllContent<T>() {
+export function getContentTree<T>() {
   return get<IRes<T>>('/api/nb/get_content_tree').then((data) => {
     return data.data;
   })
 }
 
-export function getFileList<T>() {
-  return get<IRes<T>>('/api/nb/get_content_list').then((data) => {
+export function getFileList<T>(parentId: string) {
+  return get<IRes<T>>('/api/nb/get_file_by_content', {parentId}).then((data) => {
     return data.data;
   })
 }
