@@ -3,7 +3,7 @@
  */
 import { randomNum } from "@/util"
 import { regCheckBoxFalse, regCheckBoxTrue, regCode, regCodeEnd, regCodeStart, regContent, regCrossbar, regGCheckBoxFalse, regGCheckBoxTrue, regGCode, regGContent, regGImg, regGLink, regImg, regLink, regMark, regNumber, regSharp, TagMap } from "./regexp"
-import { controlSaveWord, attributeSaveWord, declareSaveWord } from "@/util/keyWords";
+import { controlSaveWord, attributeSaveWord, declareSaveWord, savedWords } from "@/util/keyWords";
 
 type IFormater = {
   html: string;
@@ -13,19 +13,31 @@ type IFormater = {
   doubleSpace?: boolean;
 }
 
-const allMatch = new RegExp('\\b((' + controlSaveWord.join('|') + ')|(' + declareSaveWord.join('|') + ')|(' + attributeSaveWord.join('|') + '))\\b', 'ig');
+const allMatch = new RegExp('(?=\\b(' + controlSaveWord.join('|') + ')\\b|\\b(' + declareSaveWord.join('|') + ')\\b|\\b(' + attributeSaveWord.join('|') + ')\\b)', 'ig');
+const savedWordsMatch = new RegExp('\\b(' + savedWords.join('|')  + ')\\b', 'ig');
+
+function getTextFromTag(codeStr: string) {
+  const div = document.createElement('div');
+  div.innerHTML = codeStr;
+  const result = div.innerText.trim();
+  return result.match(/^\/\//) ? '' : result; // 去掉注释
+}
 
 function superCode(content: string, codeType: string = '') {
   if (!content) return '';
-  // if (codeType.toLocaleLowerCase() === 'html') {
-  //   return '<code><pre>' + content.replace(/[<]/g, '&lt;').replace(/[>]/g, '&gt;') + '</pre></code>';
+  // if (['js', 'javascript'].indexOf(codeType.toLocaleLowerCase()) !== -1) {
   // }
   const text = content.replace(/[<]/g, '&lt;').replace(/[>]/g, '&gt;')
-    .replace(allMatch, ($1, $2, $3) => {
-      if ($1) return `<var class="pink">${$1}</var>`
-      if ($2) return `<var class="blue">${$2}</var>`
-      if ($3) return `<var class="purple">${$3}</var>`
+    .replace(savedWordsMatch, (matchWord) => {
+      if (controlSaveWord.indexOf(matchWord) !== -1) return `<span class="pink">${matchWord}</span>`
+      if (declareSaveWord.indexOf(matchWord) !== -1) return `<span class="blue">${matchWord}</span>`
+      if (attributeSaveWord.indexOf(matchWord) !== -1) return `<span class="purple">${matchWord}</span>`
       return '';
+    // .replace(allMatch, ($1, $2, $3) => {
+    //   if ($1) return `<var class="pink">${$1}</var>`
+    //   if ($2) return `<span class="blue">${$2}</span>`
+    //   if ($3) return `<var class="purple">${$3}</var>`
+    //   return '';
     })
   if (!text) return '';
   return '<code><pre>' + text + '</pre></code>';
@@ -124,13 +136,20 @@ function formatLine(lineStr: string, codeText: boolean, codeType: string): IForm
 }
 
 export function md2HTML(mdStr = '') {
-  if (!mdStr || !(mdStr.trim())) return '';
+  if (!mdStr || !(mdStr.trim())) return [''];
+  /** 按行切分 */
   const strList = mdStr.trim().replace(/((^[\r\n])|([\r\n]$))/g, '').split(/[\r\n]/g);
+  /** store */
   let htmlObj = {};
+  /** 游标：html tag */
   let lastHtmlTag = '';
+  /** 游标：匹配 */
   let lastMatcher = '';
+  /** 游标：code tag */
   let lastCodeTag = '';
+  /** random key */
   let key = 0;
+  /** code type: js\ts\css\text etc. */
   let codeType = ''
   strList.forEach((item, index) => {
     const {html, tag, ct, macher, doubleSpace} = formatLine(item, lastCodeTag === 'code', codeType);
@@ -164,11 +183,12 @@ export function md2HTML(mdStr = '') {
     } else if (tag === 'sCode') {
       codeType = codeType || ct || '';
       if (lastCodeTag === 'code') {
-        htmlObj[`${lastCodeTag}-${key}`].push(`<div>${html}</div>`);
+        htmlObj[`${lastCodeTag}-${key}`].push(html); // 不知为啥包个div了 T_T
       } else {
         lastCodeTag = 'code';
         key = randomNum();
         htmlObj[`${lastCodeTag}-${key}`] = [];
+        htmlObj[`${lastCodeTag}-${key}`].codeType = codeType;
       }
     } else if (tag === 'eCode') {
       lastCodeTag = '';
@@ -187,6 +207,8 @@ export function md2HTML(mdStr = '') {
     }
   });
 
+  // console.log(htmlObj);
+  const codeList: string[] = [];
   let result = '';
   Object.keys(htmlObj).forEach((key) => {
     const [tag, nKey, matcher] = key.split('-');
@@ -195,10 +217,21 @@ export function md2HTML(mdStr = '') {
     } else if (tag === 'ol') {
       result += `<ol start="${matcher}">${htmlObj[key].join('')}</ol>`;
     } else if (tag === 'code') {
-      const tBody = htmlObj[key].map((item: string, index: number) => {
+      const data = htmlObj[key];
+      const codeType = data.codeType;
+      const isJsCode = ['js', 'javascript'].indexOf(codeType.toLocaleLowerCase()) !== -1;
+      let codeStr = '';
+      let codeIndex = -1;
+      const tBody = data.map((item: string, index: number) => {
+        isJsCode ? codeStr += getTextFromTag(item) : '';
         return `<tr><td class="codeNo">${index + 1}</td><td class="codeText">${item}</td></tr>`;
       }).join('');
+      if (codeStr) {
+        codeIndex = codeList.length;
+        codeList.push(codeStr)
+      }
       const table = `
+      <div class="${codeType}-code">
         <table class="code">
           <colgroup>
             <col width="30">
@@ -208,15 +241,16 @@ export function md2HTML(mdStr = '') {
             ${tBody}
           </tbody>
         </table>
-      `
+        ${isJsCode ? `<a class="code-run-btn" data-codeIndex="${codeIndex}">Run</a>` : ''}
+      </div>`
       result += table;
-    } else if (tag) {
+    } else if (!tag.match(/^h\d/)) { // 不是hx
       result += `<${tag}>${htmlObj[key].join('')}</${tag}>`
     } else {
       const dom = htmlObj[key][0];
       result += dom;
     }
   })
-
-  return result;
+  codeList.unshift(result);
+  return codeList;
 }

@@ -208,3 +208,21 @@ img {
     }
   }
 }
+
+.js-code, .javascript-code {
+  position: relative;
+  .code-run-btn {
+    display: none;
+  }
+  &:hover .code-run-btn {
+    display: inline-block;
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    background: #666;
+    border-radius: 4px;
+    padding: 2px 4px;
+    cursor: pointer;
+    color: #00ff4b;
+  }
+}

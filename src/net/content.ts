@@ -6,7 +6,7 @@ export function addContent<T>(name: string, type: FileType, parentId: number) {
     return res.data;
   }).catch((err) => {
     console.log(err);
-    return {id: 0};
+    return null;
   })
 }
 

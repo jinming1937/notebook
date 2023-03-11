@@ -115,7 +115,7 @@ export function initContent () {
     }
     currentFileList.unshift(newContent);
     return addContent<{id: number}>(newContent.name, newContent.type, current.id).then((data) => {
-      if (data.id) {
+      if (data && data.id) {
         newContent.id = data.id;
         if (currentFile) {
           currentFile.editing = false;
@@ -261,11 +261,18 @@ export function initContent () {
           current.active = true;
         }
       }
+      if (currentFile.type === 'content') {
+        current?.children.forEach((i) => {
+          if (i.id === currentFile?.id) {
+            i.name = currentFile.name;
+          }
+        })
+        renderContent(list);
+      }
       debounce(() => {
         changeContentTitle(currentFile!.name, currentFile!.id).then((data) => {
           if (data) {
             console.log('success');
-            renderContent(list);
             renderFileList(currentFileList || []);
           }
         })

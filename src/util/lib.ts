@@ -31,12 +31,8 @@ export function message(type: 'error'| 'info', msg: string) {
 }
 
 export function encodeText(str = '') {
-  return str ? window.btoa(encodeURI(str)) : '';
+  return str ? encodeURI(str) : '';
 }
 export function decodeText(str = '', time = '') {
-  if (time && new Date(time) > new Date('2023-01-29 13:05:49')) {
-    return decodeURI(window.atob(str));
-  } else {
-    return str;
-  }
+  return str ? decodeURI(str) : '';
 }
