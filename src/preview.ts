@@ -34,10 +34,12 @@ window.onload = (ev) => {
   $dom('frameBox')?.addEventListener("click", (e) => {
     const runScriptIndex = e.target && (e.target as HTMLElement).getAttribute('data-codeIndex') || -1;
     if (runScriptIndex !== -1 && Array.isArray(scriptList) && scriptList[runScriptIndex]) {
+      const code = scriptList[runScriptIndex];
       new Promise(() => {
-        eval(scriptList[runScriptIndex]);
+        console.log(code);
+        eval(code);
       }).catch((error) => {
-        console.error('eval script error', error, '\n', scriptList[runScriptIndex]);
+        console.error('eval script error', error, '\n', code);
       })
     }
     // const scriptList = $dom('frameBox')?.querySelectorAll('script');
