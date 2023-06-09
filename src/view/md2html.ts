@@ -20,7 +20,7 @@ function getTextFromTag(codeStr: string) {
   const div = document.createElement('div');
   div.innerHTML = codeStr;
   const result = div.innerText.trim();
-  return result.match(/^\/\//) ? '' : result.replace(/\/\/.*/g, ''); // 去掉注释
+  return result.replace(/^\/(\/.*|[*].*[*]\/$)/g, ''); // 去掉注释
 }
 
 function superCode(content: string, codeType: string = '') {
