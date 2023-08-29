@@ -9,7 +9,8 @@ const config = {
   entry: {
     main: ['./src/css/base.less', './src/index.ts'],
     preview: ['./src/css/preview.less', './src/preview.ts'],
-    link: ['./src/css/link.less', './src/link.ts']
+    link: ['./src/css/link.less', './src/link.ts'],
+    map: ['./src/map.ts']
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -42,7 +43,12 @@ const config = {
       filename: 'link.html',
       chunks: ['link'],
       template: './build/link.html',
-    })
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'map.html',
+      chunks: ['map'],
+      template: './build/map.html',
+    }),
   ],
   devServer: {
     port: 9292,
