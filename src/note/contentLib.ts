@@ -54,7 +54,7 @@ export function uploadImgHandler(files: FileList, currentFile: IContent, callbac
     if (file.type.toLowerCase().match(/(jpe?g|png|gif|webp)/g)) {
       const formData = new FormData()
       formData.append('img', file);
-      uploadImg<{data: string[]}>(formData).then((data) => {
+      uploadImg<string[]>(formData).then((data) => {
         if (data && currentFile) {
           const value = insertImg(data[0]);
           callback(value);

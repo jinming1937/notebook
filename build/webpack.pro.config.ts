@@ -15,7 +15,8 @@ const config: Configuration = {
   entry: {
     main: ['./src/index.ts'],
     preview: ['./src/preview.ts'],
-    link: ['./src/link.ts']
+    link: ['./src/link.ts'],
+    map: ['./src/map.ts'],
   },
   output: {
     path: resolve('dist'),
@@ -30,19 +31,28 @@ const config: Configuration = {
   module: {
     rules: [
       { test: /\.ts$/, use: 'ts-loader' },
-      { test: /\.css$/, use: [
-        {
-          loader: MiniCssExtractPlugin.loader,
-          options: { publicPath: "static/img/"}
-        },
-        'css-loader'
-      ]},
-      { test: /\.less$/, use: [
-        {
-          loader: MiniCssExtractPlugin.loader,
-          options: { publicPath: "static/img/"}
-        },'css-loader', 'less-loader'
-      ]}
+      {
+        test: /\.css$/, use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: { publicPath: "/static/img/" }
+          },
+          'css-loader'
+        ]
+      },
+      {
+        test: /\.less$/, use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: { publicPath: "/static/img/" }
+          }, 'css-loader', 'less-loader'
+        ]
+      },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        type: 'asset/resource',
+        // use: [{options: { publicPath: "static/img/" }}]
+      }
     ],
   },
   plugins: [
@@ -66,6 +76,13 @@ const config: Configuration = {
       filename: 'link.html',
       chunks: ['link'],
       template: './build/link.html',
+    }),
+    new HtmlWebpackPlugin({
+      title: 'map',
+      minify: true,
+      filename: 'map.html',
+      chunks: ['map'],
+      template: './build/map.html',
     }),
     new MiniCssExtractPlugin({
       filename: 'static/[name].[chunkhash:8].css',

@@ -19,7 +19,9 @@ function formatContent(data: IContent): IData {
   if (data.children.length > 0) {
     const children: IData[] = [];
     data.children.forEach((i) => {
-      children.push(formatContent(i));
+      if (i.id !== 4) { // 4 工作
+        children.push(formatContent(i));
+      }
     })
     item.children = children;
   } else {

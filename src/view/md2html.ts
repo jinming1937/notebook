@@ -48,7 +48,7 @@ function format(content: string) {
   [regContent, regLink, regImg, regCode, regCheckBoxTrue, regCheckBoxFalse].forEach((item, indexer) => {
     const result = content.match(item);
     if (result) {
-      const tag = result[1]
+      const tag = result[1] as keyof typeof TagMap;
       const textOrLink = result[2]
       const index = result.index || 0;
 
