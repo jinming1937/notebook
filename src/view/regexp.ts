@@ -21,11 +21,28 @@ export const TagMap = {
   '```': 'samp',
 }
 // 匹配行内链接
-export const regLink = /(?<!\!)[\[](.+?)[\]][\(](.+?)[\)]/
+/**
+ * [xxx](xxxx)
+ * 后行断言：先是[]()结构，再到 不是!
+*/
+export const regLink = /(?<!\!)[\[](.*?)[\]][\(](.*?)[\)]/
+/**
+ * ![xxx](xxxx)
+ * !后是 []()
+*/
 export const regImg = /(?<=\!)[\[](.+?)[\]][\(](.+?)[\)]/
 export const regCheckBoxFalse = /\[\]/;
 export const regCheckBoxTrue = /\[x\]/;
+// 匹配行内链接
+/**
+ * G
+ * [xxx](xxxx)
+*/
 export const regGLink = /(?<!\!)[\[](.+?)[\]][\(](.+?)[\)]/g
+/**
+ * G
+ * ![xxx](xxxx)
+*/
 export const regGImg = /(?<=\!)[\[](.+?)[\]][\(](.+?)[\)]/g
 export const regGCheckBoxFalse = /\[\]/g;
 export const regGCheckBoxTrue = /\[x\]/g;

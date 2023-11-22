@@ -1,4 +1,4 @@
-import { $dom } from "@/util";
+import { $dom, throttle } from "@/util";
 import { IDS } from './ids';
 
 const maxWidth = 360;
@@ -20,13 +20,15 @@ export function initActiveBar() {
     $BarDom.activeBarMask.className = 'activeBarMask contentMask';
     $BarDom.targetBar.style.left = `${e.clientX - 1}px`;
   });
-  $BarDom.activeBarMask.addEventListener('mousemove', (e) => {
+  $BarDom.activeBarMask.addEventListener('mousemove', throttle((e) => {
     const left = e.clientX;
     if (flag && left <= maxWidth && left >= minWidth) {
-      $BarDom.targetBar.style.left = `${left - 1}px`;
-      $BarDom.content.style.width = `${left + 167}px`;
+      setTimeout(() => {
+        $BarDom.targetBar.style.left = `${left - 1}px`;
+        $BarDom.content.style.width = `${left + 167}px`;
+      }, 0)
     }
-  });
+  }, 50 / 3));
   $BarDom.activeBarMask.addEventListener('mouseup', (e) => {
     flag = false;
     $BarDom.activeGap.className = 'activeGap hidden';

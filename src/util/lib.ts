@@ -1,9 +1,21 @@
 let flag: any = 0;
+
+// 防抖
 export function debounce(callback: () => void, timeFlag: number) {
   clearTimeout(flag);
   flag = setTimeout(() => {
     callback && callback()
   }, timeFlag);
+}
+// 节流 
+export function throttle(callback: (e: any) => void, timeFlag: number = 0) {
+  let now = Date.now();
+  return (e: any) => {
+    if (now + timeFlag < Date.now()) {
+      now = Date.now();
+      callback(e)
+    }
+  }
 }
 
 export function sendToFrame() {
