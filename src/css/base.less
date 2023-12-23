@@ -191,15 +191,20 @@
           }
         }
 
-        .file::before {
-          content: ' ';
-          width: 5px;
-          height: 5px;
-          border-radius: 5px;
-          background-color: #00cfcd;
-          display: inline-block;
-          margin-right: 5px;
-          vertical-align: middle;
+        .file {
+          &::before {
+            content: ' ';
+            width: 5px;
+            height: 5px;
+            border-radius: 5px;
+            background-color: #00cfcd;
+            display: inline-block;
+            margin-right: 5px;
+            vertical-align: middle;
+          }
+          &.error::before {
+            background-color: red;
+          }
         }
 
         .active {
@@ -282,7 +287,7 @@
           background: transparent;
           resize: none;
           padding-bottom: 300px;
-          font-family: Microsoft YaHei,微软雅黑,宋体,sans-serif;
+          font-family: "Microsoft YaHei","微软雅黑","宋体",sans-serif;
         }
       }
     }
