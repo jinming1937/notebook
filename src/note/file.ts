@@ -44,6 +44,8 @@ export function readFileById(id: number, type: string, name: string) {
       const text = decodeText(data ? data.content : '', data?.update_time);
       $dom<HTMLInputElement>(IDS.InputBox)!.value = text;
       sender(text)
+    }).catch((e) => {
+      $dom<HTMLInputElement>(IDS.FileList)?.querySelector(`[key="${id}"]`)?.classList.add('error')
     });
   } else {
     sender('')

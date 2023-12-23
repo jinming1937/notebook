@@ -221,10 +221,13 @@ export function initContent () {
         saveFile(id, needSaveValue).then((data) => {
           if (data) {
             console.log('save success!');
+            $ContentDom.fileList.querySelector(`[key="${id}"]`)?.classList.remove('error')
           } else {
             console.log('save fail!');
+            $ContentDom.fileList.querySelector(`[key="${id}"]`)?.classList.add('error')
           }
         });
+        // TODO xxx
       }, AUTO_SAVE_DELAY_TIME);
     }
   }
@@ -340,19 +343,19 @@ export function initContent () {
       const id = parseInt(itemKey);
       const item = currentFileList.find(i => i.id === id);
       if (item) {
+        const classList = [];
+        if (item?.type === 'file') {
+          classList.push('file');
+        }
+        if (item?.editing) {
+          classList.push('active');
+        }
+        element.className = classList.join(' ');
+        element.draggable = true;
         currentFile = item;
         currentFile.editing = true;
         readFileById(id, element.className, element.title);
       }
-      const classList = [];
-      if (item?.type === 'file') {
-        classList.push('file');
-      }
-      if (item?.editing) {
-        classList.push('active');
-      }
-      element.className = classList.join(' ');
-      element.draggable = true;
     }
   });
   $ContentDom.addFile.addEventListener('click', () => addFileHandler());
