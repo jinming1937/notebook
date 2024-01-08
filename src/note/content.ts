@@ -354,7 +354,7 @@ export function initContent () {
         }
         element.draggable = true;
         element.className = classList.join(' ');
-        readFileById(id, element.className, element.title);
+        readFileById(id, item?.type, element.title);
       }
     }
   });
