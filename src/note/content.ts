@@ -343,6 +343,8 @@ export function initContent () {
       const id = parseInt(itemKey);
       const item = currentFileList.find(i => i.id === id);
       if (item) {
+        currentFile = item;
+        item.editing = true;
         const classList = [];
         if (item?.type === 'file') {
           classList.push('file');
@@ -350,10 +352,8 @@ export function initContent () {
         if (item?.editing) {
           classList.push('active');
         }
-        element.className = classList.join(' ');
         element.draggable = true;
-        currentFile = item;
-        currentFile.editing = true;
+        element.className = classList.join(' ');
         readFileById(id, element.className, element.title);
       }
     }
