@@ -37,6 +37,7 @@ export const initLogin = (loginCb?: () => void, logoutCb?: () => void) => {
       if (data !== 0) { // 登录态过期
         $dom('mask')!.className = 'mask';
         $dom('pwd')?.focus();
+        $dom<HTMLUListElement>('searchResult')!.innerHTML = '';
         stop();
         sender('');
         isLogin = false;
@@ -82,6 +83,7 @@ export const initLogin = (loginCb?: () => void, logoutCb?: () => void) => {
       sender('');
       $dom('mask')!.className = 'mask';
       $dom('pwd')?.focus();
+      $dom<HTMLUListElement>('searchResult')!.innerHTML = '';
       isLogin = false
     });
   });
