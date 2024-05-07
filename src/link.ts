@@ -1,7 +1,7 @@
 import { $dom, encodeText, sendToFrame } from './util';
 import { initLogin } from './note/login';
-import { getFileById, searchFileByKey } from './net/file';
-import { registerTheme } from '@/component/theme';
+import { getFile, getFileById, searchFileByKey } from './net/file';
+import { registerTheme, setTimeTheme } from '@/component/theme';
 import { registerBg } from '@/component/background';
 import './css/link.less'
 
@@ -19,9 +19,22 @@ window.addEventListener('load', () => {
   }
 
   // 安全管理
-  initLogin();
+  initLogin(() => {
+    console.log('login success');
+    if(location.search.includes('id=')) {
+      const id = location.search.split('id=')[1];
+      getFile<{content: string}>(Number(id)).then((data) => {
+        const text = decodeURI(data ? data.content : '');
+        sender(text);
+      });
+    }
+  }, () => {
+    $dom<HTMLUListElement>('searchResult')!.innerHTML = '';
+  });
   registerTheme(tool.frame, tool.theme);
   registerBg(tool.bg, tool.page);
+
+  setTimeTheme(tool.frame, tool.theme);
 
   $dom('searchBookMarks')?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
@@ -49,5 +62,5 @@ window.addEventListener('load', () => {
         sender(text)
       });
     }
-  })
+  });
 });
