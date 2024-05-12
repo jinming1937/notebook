@@ -1,5 +1,8 @@
 import { IContent } from "./entity/common";
-import { getContentTree } from "./net/content";
+import { getContentTree, getFileList } from "./net/content";
+import { initLogin } from "./note/login";
+import './css/map.less'
+import { $dom } from "./util";
 
 type IData = {
   name: string;
@@ -107,19 +110,35 @@ function init() {
       if (option && typeof option === 'object') {
         myChart.setOption(option);
       }
-
     }
   });
 
   myChart.on('click', function(params: any) {
     // 控制台打印数据的名称
-    console.log(params.name, params.data.id, params.value);
+    if (params.data.id) {
+      getFileList<IContent[]>(params.data.id).then((data) => {
+        $dom('fileList')!.innerHTML = data.map((i) => `<div class="file-item" data-id="${i.id}" data-type="${i.type}">${i.name}${i.type === 'file' ? '' : ' >>'}</div>`).join(''); // 显示文件列表
+      });
+    }
+  });
+
+  $dom('fileList')!.addEventListener('click', function(e: any) {
+    const id = e.target.getAttribute('data-id');
+    const type = e.target.getAttribute('data-type');
+    if (id && type === "file") {
+      window.open(`./link.html?id=${id}`);
+    }
   });
 
   window.addEventListener('resize', myChart.resize);
 }
 
 window.onload = function() {
-  init();
+  // 安全管理
+  initLogin(() => {
+    init();
+  }, () => {
+    // init(true);
+  });
 }
 

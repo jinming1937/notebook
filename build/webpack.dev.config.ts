@@ -10,7 +10,7 @@ const config = {
     main: ['./src/css/base.less', './src/index.ts'],
     preview: ['./src/css/preview.less', './src/preview.ts'],
     link: ['./src/css/link.less', './src/link.ts'],
-    map: ['./src/map.ts']
+    map: ['./src/map.ts', './src/css/map.less'],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
