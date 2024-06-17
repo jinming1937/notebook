@@ -18,6 +18,7 @@ window.onload = (ev) => {
   window.addEventListener('message', function(e) {
     const origin = window.parent.location.origin;
     if([origin, `${origin}/link.html`].indexOf(e.origin) !== -1) {
+      console.log('收到父页面消息：', e.data ? e.data.slice(0, 10) + '...' : '');
       if (typeof e.data === 'string') {
         scriptList.length = 0; // 清空
         const [htmlString, ...codeStringArray] = md2HTML(e.data || '');
@@ -27,12 +28,12 @@ window.onload = (ev) => {
     }
   });
 
-  window.parent.postMessage({msg: 'preview page ready'}, '*');
+  window.parent.postMessage({msg: 'preview page ready'}, location.origin);
 
   timeTheme();
 
   $dom('frameBox')?.addEventListener("click", (e) => {
-    const runScriptIndex = e.target && (e.target as HTMLElement).getAttribute('data-codeIndex') || -1;
+    const runScriptIndex: number = Number(e.target && (e.target as HTMLElement).getAttribute('data-codeIndex') || '-1') || -1;
     if (runScriptIndex !== -1 && Array.isArray(scriptList) && scriptList[runScriptIndex]) {
       const code = scriptList[runScriptIndex];
       new Promise(() => {

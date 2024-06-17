@@ -140,7 +140,7 @@ export function md2HTML(mdStr = '') {
   /** 按行切分 */
   const strList = mdStr.trim().replace(/((^[\r\n])|([\r\n]$))/g, '').split(/[\r\n]/g);
   /** store */
-  let htmlObj = {};
+  let htmlObj: { [key: string]: string[] } = {};
   /** 游标：html tag */
   let lastHtmlTag = '';
   /** 游标：匹配 */
@@ -188,7 +188,7 @@ export function md2HTML(mdStr = '') {
         lastCodeTag = 'code';
         key = randomNum();
         htmlObj[`${lastCodeTag}-${key}`] = [];
-        htmlObj[`${lastCodeTag}-${key}`].codeType = codeType;
+        (htmlObj[`${lastCodeTag}-${key}`] as unknown as { codeType: string }).codeType = codeType;
       }
     } else if (tag === 'eCode') {
       lastCodeTag = '';
@@ -218,7 +218,7 @@ export function md2HTML(mdStr = '') {
       result += `<ol start="${matcher}">${htmlObj[key].join('')}</ol>`;
     } else if (tag === 'code') {
       const data = htmlObj[key];
-      const codeType = data.codeType;
+      const codeType = (htmlObj[key] as unknown as { codeType: string }).codeType;
       const isJsCode = ['js', 'javascript'].indexOf(codeType.toLocaleLowerCase()) !== -1;
       let codeStr = '';
       let codeIndex = -1;
