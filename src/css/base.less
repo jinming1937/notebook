@@ -316,6 +316,18 @@
     .content {
       color: #eee;
 
+      .fileContent {
+        .fileTitle {
+          input {
+            background: rgb(255 255 255 / 60%);
+
+            &::placeholder {
+              color: #333; /* 修改占位符颜色 */
+            }
+          }
+        }
+      }
+
       .treeContent {
         li .file_icon {
           &.open {
@@ -337,6 +349,10 @@
       .toolBar {
         color: #eee;
         border-bottom: 1px solid #999;
+
+        input[type="checkbox"], select {
+          background: rgb(255 255 255 / 60%);
+        }
       }
       .inputBox {
         color: #eee;
@@ -352,6 +368,10 @@
     .editor {
       .toolBar {
         color: #222;
+
+        input[type="checkbox"], select {
+          background: rgb(255 255 255 / 60%);
+        }
       }
 
       .inputBox {
@@ -361,6 +381,14 @@
 
     .content {
       color: #222;
+
+      .fileContent {
+        .fileTitle {
+          input {
+            background: rgb(255 255 255 / 60%)
+          }
+        }
+      }
     }
   }
 
@@ -381,4 +409,3 @@
     }
   }
 }
-
