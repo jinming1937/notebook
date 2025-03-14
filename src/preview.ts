@@ -33,11 +33,11 @@ window.onload = (ev) => {
   timeTheme();
 
   $dom('frameBox')?.addEventListener("click", (e) => {
-    const runScriptIndex: number = Number(e.target && (e.target as HTMLElement).getAttribute('data-codeIndex') || '-1') || -1;
+    const runScriptIndex: number = Number(e.target && (e.target as HTMLElement).getAttribute('data-codeindex') || '-1') ?? -1;
     if (runScriptIndex !== -1 && Array.isArray(scriptList) && scriptList[runScriptIndex]) {
       const code = scriptList[runScriptIndex];
       new Promise(() => {
-        console.log(code);
+        console.log('code:', code);
         eval(code);
       }).catch((error) => {
         console.error('eval script error', error, '\n', code);

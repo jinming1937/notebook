@@ -242,7 +242,7 @@ export function md2HTML(mdStr = '') {
             ${tBody}
           </tbody>
         </table>
-        ${isJsCode && codeStr ? `<a class="code-run-btn" data-codeIndex="${codeIndex}">Run</a>` : ''}
+        ${isJsCode && codeStr ? `<a class="code-run-btn" data-codeindex="${codeIndex}">Run</a>` : ''}
         ${isCssCode && codeStr ? `<style>${codeStr}</style>` : ''}
       </div>`
       // css style 标签注入风险: background-image url等
