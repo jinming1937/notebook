@@ -17,24 +17,32 @@ export function throttle(callback: (e: any) => void, timeFlag: number = 0) {
     }
   }
 }
-
-export function sendToFrame() {
-  //主页面发送消息
-  const myFrame = document.getElementById("frameDom");//获取框架
-
-  window.addEventListener('message', function(e) {
-    console.log('收到子页面消息：', e.data?.msg);
-  })
-  return (value: string) => {
-    (myFrame as HTMLIFrameElement)?.contentWindow?.postMessage(value, location.href);
+let flagListener = false;
+let listenerCounter = 0;
+function oneListener() {
+  if (flagListener) return;
+  flagListener = true;
+  function listener(e: MessageEvent<any>) {
+    // TODO: 重复消息
+    if (e.data?.msg) {
+      console.log('收到子页面消息：', e.data?.msg);
+    } else {
+      console.log('收到子页面消息?：', e.data);
+    }
   }
+  listenerCounter += 1;
+  console.log('注册子页面监听', listenerCounter);
+  window.removeEventListener('message', listener);
+  window.addEventListener('message', listener);
 }
 
-export function notification(girlFrame: HTMLIFrameElement) {
-  return (msg: string | {content: string, type: 'warning' | 'error' | 'info'}) => {
-    if (typeof msg === 'string') {
-      (girlFrame as HTMLIFrameElement)?.contentWindow?.postMessage({msg, type: 'tooltip'}, location.href)
-    }
+export function sendToFrame() {
+  oneListener();
+  //主页面发送消息
+  const myFrame = document.getElementById("frameDom");//获取框架
+  return (value: string) => {
+    console.log('发送消息给子页面：', value ? value.slice(0, 10) + '...' : '');
+    (myFrame as HTMLIFrameElement)?.contentWindow?.postMessage(value, location.href);
   }
 }
 

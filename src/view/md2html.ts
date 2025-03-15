@@ -140,7 +140,7 @@ export function md2HTML(mdStr = '') {
   /** 按行切分 */
   const strList = mdStr.trim().replace(/((^[\r\n])|([\r\n]$))/g, '').split(/[\r\n]/g);
   /** store */
-  let htmlObj = {};
+  let htmlObj: { [key: string]: string[] } = {};
   /** 游标：html tag */
   let lastHtmlTag = '';
   /** 游标：匹配 */
@@ -188,7 +188,7 @@ export function md2HTML(mdStr = '') {
         lastCodeTag = 'code';
         key = randomNum();
         htmlObj[`${lastCodeTag}-${key}`] = [];
-        htmlObj[`${lastCodeTag}-${key}`].codeType = codeType;
+        (htmlObj[`${lastCodeTag}-${key}`] as unknown as { codeType: string }).codeType = codeType;
       }
     } else if (tag === 'eCode') {
       lastCodeTag = '';
@@ -218,12 +218,13 @@ export function md2HTML(mdStr = '') {
       result += `<ol start="${matcher}">${htmlObj[key].join('')}</ol>`;
     } else if (tag === 'code') {
       const data = htmlObj[key];
-      const codeType = data.codeType;
+      const codeType = (htmlObj[key] as unknown as { codeType: string }).codeType;
       const isJsCode = ['js', 'javascript'].indexOf(codeType.toLocaleLowerCase()) !== -1;
+      const isCssCode = ['css'].indexOf(codeType.toLocaleLowerCase())!== -1;
       let codeStr = '';
       let codeIndex = -1;
       const tBody = data.map((item: string, index: number) => {
-        isJsCode ? codeStr += getTextFromTag(item) : '';
+        isJsCode || isCssCode ? codeStr += getTextFromTag(item) : '';
         return `<tr><td class="codeNo">${index + 1}</td><td class="codeText">${item}</td></tr>`;
       }).join('');
       if (codeStr) {
@@ -241,8 +242,10 @@ export function md2HTML(mdStr = '') {
             ${tBody}
           </tbody>
         </table>
-        ${isJsCode ? `<a class="code-run-btn" data-codeIndex="${codeIndex}">Run</a>` : ''}
+        ${isJsCode && codeStr ? `<a class="code-run-btn" data-codeindex="${codeIndex}">Run</a>` : ''}
+        ${isCssCode && codeStr ? `<style>${codeStr}</style>` : ''}
       </div>`
+      // css style 标签注入风险: background-image url等
       result += table;
     } else if (!tag.match(/^h\d/)) { // 不是hx
       result += `<${tag}>${htmlObj[key].join('')}</${tag}>`

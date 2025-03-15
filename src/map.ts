@@ -138,7 +138,7 @@ window.onload = function() {
   initLogin(() => {
     init();
   }, () => {
-    // init(true);
+    $dom('fileList')!.innerHTML = '';
   });
 }
 
